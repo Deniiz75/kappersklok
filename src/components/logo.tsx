@@ -111,19 +111,3 @@ export function Logo({ size = 40, className = "" }: LogoProps) {
     </svg>
   );
 }
-
-export function LogoFull({ size = 40, className = "" }: LogoProps) {
-  return (
-    <div className={`flex items-center gap-2.5 ${className}`}>
-      <Logo size={size} />
-      <div className="flex flex-col leading-none">
-        <span className="font-heading text-xl font-bold tracking-tight text-foreground">
-          Kappersklok
-        </span>
-        <span className="text-[10px] tracking-[0.2em] uppercase text-gold/70">
-          voor haar &amp; hem
-        </span>
-      </div>
-    </div>
-  );
-}
