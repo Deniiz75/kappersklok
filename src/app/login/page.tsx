@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { loginAction } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { HeroBanner } from "@/components/hero-banner";
@@ -21,7 +20,12 @@ export default function LoginPage() {
       password: (form.elements.namedItem("password") as HTMLInputElement).value,
     };
 
-    const result = await loginAction(data);
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json();
     if (result.success) {
       router.push("/dashboard");
     } else {
