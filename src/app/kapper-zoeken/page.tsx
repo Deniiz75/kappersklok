@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { getActiveShopsWithBarbers } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 import { HeroBanner } from "@/components/hero-banner";
@@ -14,11 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function KapperZoekenPage() {
-  const shops = await prisma.shop.findMany({
-    where: { status: "ACTIVE" },
-    orderBy: { name: "asc" },
-    include: { barbers: { where: { active: true } } },
-  });
+  const shops = await getActiveShopsWithBarbers();
 
   const cities = [...new Set(shops.map((s) => s.city).filter(Boolean))].sort();
 

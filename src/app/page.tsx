@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { SectionHeading } from "@/components/section-heading";
 import { Logo } from "@/components/logo";
 import { ShopMonogram } from "@/components/shop-monogram";
-import { prisma } from "@/lib/prisma";
+import { getActiveShops } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -46,11 +46,7 @@ const testimonials = [
 ];
 
 export default async function Home() {
-  const allShops = await prisma.shop.findMany({
-    where: { status: "ACTIVE" },
-    orderBy: { name: "asc" },
-    select: { id: true, name: true, slug: true, city: true },
-  });
+  const allShops = await getActiveShops();
 
   const featuredShops = allShops.slice(0, 12);
 

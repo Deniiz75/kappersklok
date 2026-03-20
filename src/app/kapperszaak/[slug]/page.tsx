@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { getShopBySlug } from "@/lib/db";
 import { HeroBanner } from "@/components/hero-banner";
 import { MapPin, Phone, Instagram } from "lucide-react";
 
@@ -10,7 +10,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const shop = await prisma.shop.findUnique({ where: { slug, status: "ACTIVE" } });
+  const shop = await getShopBySlug(slug);
   if (!shop) return { title: "Kapper niet gevonden" };
   return {
     title: shop.name,
@@ -20,10 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function KapperszaakPage({ params }: Props) {
   const { slug } = await params;
-  const shop = await prisma.shop.findUnique({
-    where: { slug, status: "ACTIVE" },
-    include: { barbers: { where: { active: true } } },
-  });
+  const shop = await getShopBySlug(slug);
 
   if (!shop) notFound();
 
@@ -77,7 +74,7 @@ export default async function KapperszaakPage({ params }: Props) {
                   Kappers ({shop.barbers.length})
                 </h3>
                 <ul className="mt-3 space-y-2">
-                  {shop.barbers.map((barber) => (
+                  {shop.barbers.map((barber: { id: string; name: string }) => (
                     <li
                       key={barber.id}
                       className="rounded-md border border-border bg-background px-4 py-2 text-sm"
