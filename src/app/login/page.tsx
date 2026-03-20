@@ -23,7 +23,7 @@ export default function LoginPage() {
 
     const result = await loginAction(data);
     if (result.success) {
-      router.push("/");
+      router.push("/dashboard");
     } else {
       setError(result.error);
       setStatus("error");
