@@ -71,5 +71,103 @@ export async function getShopBySlug(slug: string) {
     .eq("shopId", shop.id)
     .eq("active", true);
 
-  return { ...shop, barbers: barbers || [] };
+  const { data: services } = await supabase
+    .from("Service")
+    .select("id, name, duration, price, active, sortOrder")
+    .eq("shopId", shop.id)
+    .eq("active", true)
+    .order("sortOrder");
+
+  const { data: businessHours } = await supabase
+    .from("BusinessHours")
+    .select("dayOfWeek, openTime, closeTime, closed")
+    .eq("shopId", shop.id)
+    .order("dayOfWeek");
+
+  return {
+    ...shop,
+    barbers: barbers || [],
+    services: services || [],
+    businessHours: businessHours || [],
+  };
+}
+
+export async function getShopByUserId(userId: string) {
+  const { data: shop, error } = await supabase
+    .from("Shop")
+    .select("*")
+    .eq("userId", userId)
+    .single();
+  if (error || !shop) return null;
+
+  const { data: barbers } = await supabase
+    .from("Barber")
+    .select("*")
+    .eq("shopId", shop.id)
+    .order("name");
+
+  const { data: services } = await supabase
+    .from("Service")
+    .select("*")
+    .eq("shopId", shop.id)
+    .order("sortOrder");
+
+  const { data: businessHours } = await supabase
+    .from("BusinessHours")
+    .select("*")
+    .eq("shopId", shop.id)
+    .order("dayOfWeek");
+
+  return {
+    ...shop,
+    barbers: barbers || [],
+    services: services || [],
+    businessHours: businessHours || [],
+  };
+}
+
+export async function getAppointmentsForShop(shopId: string, date?: string) {
+  let query = supabase
+    .from("Appointment")
+    .select("*, barber:Barber(name), service:Service(name, duration, price)")
+    .eq("shopId", shopId)
+    .order("date", { ascending: true })
+    .order("startTime", { ascending: true });
+
+  if (date) {
+    query = query.eq("date", date);
+  }
+
+  const { data, error } = await query;
+  if (error) return [];
+  return data || [];
+}
+
+export async function getShopServices(shopId: string) {
+  const { data } = await supabase
+    .from("Service")
+    .select("id, name, duration, price, active, sortOrder")
+    .eq("shopId", shopId)
+    .eq("active", true)
+    .order("sortOrder");
+  return data || [];
+}
+
+export async function getShopBarbers(shopId: string) {
+  const { data } = await supabase
+    .from("Barber")
+    .select("id, name, active")
+    .eq("shopId", shopId)
+    .eq("active", true)
+    .order("name");
+  return data || [];
+}
+
+export async function getShopBusinessHours(shopId: string) {
+  const { data } = await supabase
+    .from("BusinessHours")
+    .select("dayOfWeek, openTime, closeTime, closed")
+    .eq("shopId", shopId)
+    .order("dayOfWeek");
+  return data || [];
 }
