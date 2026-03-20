@@ -21,6 +21,7 @@ export const metadata: Metadata = {
   },
   description:
     "Makkelijk en snel een afspraak maken bij jouw kapper. Zonder registratie, binnen enkele seconden geboekt.",
+  metadataBase: new URL("https://kappersklok.vercel.app"),
   icons: {
     icon: "/favicon.ico",
     apple: "/apple-touch-icon.png",

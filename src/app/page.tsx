@@ -22,6 +22,7 @@ import { Logo } from "@/components/logo";
 import { ShopMonogram } from "@/components/shop-monogram";
 import { getActiveShops } from "@/lib/db";
 import { OrganizationSchema } from "@/components/json-ld";
+import { FadeIn, StaggerContainer, StaggerItem, ScaleIn } from "@/components/motion";
 
 export const dynamic = "force-dynamic";
 
@@ -58,20 +59,27 @@ export default async function Home() {
       <section className="relative overflow-hidden py-24 md:py-32">
         <div className="absolute inset-0 bg-gradient-to-b from-gold/5 via-transparent to-transparent" />
         <div className="relative mx-auto max-w-6xl px-4 text-center">
-          <h1 className="font-heading text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl">
-            Vind jouw kapper{" "}
-            <span className="text-gold">in enkele seconden</span>
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
-            Makkelijk en snel een afspraak maken bij jouw lokale kapper. Zonder
-            registratie, zonder gedoe.
-          </p>
-          <SearchBar />
+          <FadeIn>
+            <h1 className="font-heading text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl">
+              Vind jouw kapper{" "}
+              <span className="text-gold">in enkele seconden</span>
+            </h1>
+          </FadeIn>
+          <FadeIn delay={0.15}>
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
+              Makkelijk en snel een afspraak maken bij jouw lokale kapper. Zonder
+              registratie, zonder gedoe.
+            </p>
+          </FadeIn>
+          <FadeIn delay={0.3}>
+            <SearchBar />
+          </FadeIn>
 
-          {/* Trust counter */}
-          <p className="mt-8 text-sm text-muted-foreground">
-            Al <span className="font-semibold text-gold">{allShops.length}+</span> kappers aangesloten door heel Nederland
-          </p>
+          <FadeIn delay={0.45}>
+            <p className="mt-8 text-sm text-muted-foreground">
+              Al <span className="font-semibold text-gold">{allShops.length}+</span> kappers aangesloten door heel Nederland
+            </p>
+          </FadeIn>
         </div>
       </section>
 
@@ -96,77 +104,92 @@ export default async function Home() {
       {/* Hoe het werkt */}
       <section className="bg-surface py-20">
         <div className="mx-auto max-w-6xl px-4">
-          <SectionHeading title="Hoe het werkt" subtitle="In 3 simpele stappen naar jouw kapper" />
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
+          <FadeIn>
+            <SectionHeading title="Hoe het werkt" subtitle="In 3 simpele stappen naar jouw kapper" />
+          </FadeIn>
+          <StaggerContainer className="mt-12 grid gap-8 md:grid-cols-3" stagger={0.15}>
             {steps.map((step, i) => (
-              <div key={step.title} className="flex flex-col items-center text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-gold bg-gold/10">
-                  <step.icon className="h-7 w-7 text-gold" />
+              <StaggerItem key={step.title}>
+                <div className="flex flex-col items-center text-center">
+                  <ScaleIn delay={i * 0.1}>
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-gold bg-gold/10">
+                      <step.icon className="h-7 w-7 text-gold" />
+                    </div>
+                  </ScaleIn>
+                  <span className="mt-4 text-sm font-semibold text-gold">Stap {i + 1}</span>
+                  <h3 className="mt-1 text-xl font-bold">{step.title}</h3>
+                  <p className="mt-2 text-muted-foreground">{step.description}</p>
                 </div>
-                <span className="mt-4 text-sm font-semibold text-gold">Stap {i + 1}</span>
-                <h3 className="mt-1 text-xl font-bold">{step.title}</h3>
-                <p className="mt-2 text-muted-foreground">{step.description}</p>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
       {/* Featured kappers */}
       <section className="py-20">
         <div className="mx-auto max-w-6xl px-4">
-          <SectionHeading
-            title="Populaire kappers"
-            subtitle="Ontdek onze aangesloten kappers"
-          />
-          <div className="mt-12 grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+          <FadeIn>
+            <SectionHeading
+              title="Populaire kappers"
+              subtitle="Ontdek onze aangesloten kappers"
+            />
+          </FadeIn>
+          <StaggerContainer className="mt-12 grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6" stagger={0.05}>
             {featuredShops.map((shop) => (
-              <Link
-                key={shop.id}
-                href={`/kapperszaak/${shop.slug}`}
-                className="group flex flex-col items-center gap-2 rounded-xl border border-border bg-surface p-4 text-center transition-all hover:border-gold/40 hover:bg-surface/80"
-              >
-                <ShopMonogram name={shop.name} size={48} />
-                <span className="text-xs font-medium truncate w-full group-hover:text-gold transition-colors">
-                  {shop.name}
-                </span>
-                {shop.city && (
-                  <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
-                    <MapPin className="h-2.5 w-2.5" />
-                    {shop.city}
+              <StaggerItem key={shop.id}>
+                <Link
+                  href={`/kapperszaak/${shop.slug}`}
+                  className="group flex flex-col items-center gap-2 rounded-xl border border-border bg-surface p-4 text-center transition-all hover:border-gold/40 hover:bg-surface/80"
+                >
+                  <ShopMonogram name={shop.name} size={48} />
+                  <span className="text-xs font-medium truncate w-full group-hover:text-gold transition-colors">
+                    {shop.name}
                   </span>
-                )}
-              </Link>
+                  {shop.city && (
+                    <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                      <MapPin className="h-2.5 w-2.5" />
+                      {shop.city}
+                    </span>
+                  )}
+                </Link>
+              </StaggerItem>
             ))}
-          </div>
-          <div className="mt-8 text-center">
-            <ButtonLink
-              href="/kapper-zoeken"
-              variant="outline"
-              className="border-border hover:border-gold/40"
-            >
-              Bekijk alle {allShops.length} kappers
+          </StaggerContainer>
+          <FadeIn delay={0.3}>
+            <div className="mt-8 text-center">
+              <ButtonLink
+                href="/kapper-zoeken"
+                variant="outline"
+                className="border-border hover:border-gold/40"
+              >
+                Bekijk alle {allShops.length} kappers
               <ArrowRight className="ml-2 h-4 w-4" />
             </ButtonLink>
-          </div>
+            </div>
+          </FadeIn>
         </div>
       </section>
 
       {/* Features */}
       <section className="border-t border-border bg-surface py-20">
         <div className="mx-auto max-w-6xl px-4">
-          <SectionHeading title="Alles wat je nodig hebt" subtitle="Kappersklok biedt een compleet pakket voor jouw kapperszaak" />
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <FadeIn>
+            <SectionHeading title="Alles wat je nodig hebt" subtitle="Kappersklok biedt een compleet pakket voor jouw kapperszaak" />
+          </FadeIn>
+          <StaggerContainer className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" stagger={0.08}>
             {features.map((feature) => (
-              <Card key={feature.title} className="border-border bg-background transition-colors hover:border-gold/30">
-                <CardContent className="p-6">
-                  <feature.icon className="h-8 w-8 text-gold" />
-                  <h3 className="mt-4 text-lg font-bold">{feature.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{feature.description}</p>
-                </CardContent>
-              </Card>
+              <StaggerItem key={feature.title}>
+                <Card className="border-border bg-background transition-colors hover:border-gold/30 h-full">
+                  <CardContent className="p-6">
+                    <feature.icon className="h-8 w-8 text-gold" />
+                    <h3 className="mt-4 text-lg font-bold">{feature.title}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
@@ -219,18 +242,22 @@ export default async function Home() {
       {/* CTA */}
       <section className="bg-gradient-to-r from-gold/10 via-gold/5 to-transparent py-20">
         <div className="mx-auto max-w-6xl px-4 text-center">
-          <h2 className="font-heading text-3xl font-bold md:text-4xl">Start vandaag met Kappersklok</h2>
-          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-            Registreer uw kapperszaak en laat klanten eenvoudig online afspraken maken. Vanaf slechts &euro;29 per maand.
-          </p>
-          <ButtonLink
-            href="/registreren"
-            size="lg"
-            className="mt-8 bg-gold text-background hover:bg-gold-hover font-semibold text-base px-8"
-          >
-            Start vandaag
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </ButtonLink>
+          <FadeIn>
+            <h2 className="font-heading text-3xl font-bold md:text-4xl">Start vandaag met Kappersklok</h2>
+            <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
+              Registreer uw kapperszaak en laat klanten eenvoudig online afspraken maken. Vanaf slechts &euro;29 per maand.
+            </p>
+          </FadeIn>
+          <FadeIn delay={0.2}>
+            <ButtonLink
+              href="/registreren"
+              size="lg"
+              className="mt-8 bg-gold text-background hover:bg-gold-hover font-semibold text-base px-8"
+            >
+              Start vandaag
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </ButtonLink>
+          </FadeIn>
         </div>
       </section>
     </>
