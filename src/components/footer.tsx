@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Instagram } from "lucide-react";
 import { BrandLink } from "@/components/brand-link";
 
 const footerLinks = [
@@ -27,16 +26,6 @@ export function Footer() {
               </Link>
             ))}
           </nav>
-
-          <a
-            href="https://www.instagram.com/kappersklok/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-gold"
-          >
-            <Instagram className="h-4 w-4" />
-            Volg ons op Instagram
-          </a>
         </div>
 
         <div className="mt-8 border-t border-border pt-6 text-center">
