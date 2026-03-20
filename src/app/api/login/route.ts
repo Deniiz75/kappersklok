@@ -9,7 +9,20 @@ const SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secr
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
+    const contentType = req.headers.get("content-type") || "";
+    let email = "";
+    let password = "";
+
+    // Support both JSON (fetch) and form data (HTML form)
+    if (contentType.includes("application/json")) {
+      const body = await req.json();
+      email = body.email;
+      password = body.password;
+    } else {
+      const formData = await req.formData();
+      email = formData.get("email") as string;
+      password = formData.get("password") as string;
+    }
 
     if (!email || !password) {
       return NextResponse.json({ success: false, error: "Vul alle velden in." }, { status: 400 });
@@ -23,11 +36,18 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error || !user) {
+      // For form submissions, redirect back with error
+      if (!contentType.includes("application/json")) {
+        return NextResponse.redirect(new URL("/login?error=invalid", req.url));
+      }
       return NextResponse.json({ success: false, error: "Onjuist e-mailadres of wachtwoord." }, { status: 401 });
     }
 
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) {
+      if (!contentType.includes("application/json")) {
+        return NextResponse.redirect(new URL("/login?error=invalid", req.url));
+      }
       return NextResponse.json({ success: false, error: "Onjuist e-mailadres of wachtwoord." }, { status: 401 });
     }
 
@@ -36,15 +56,28 @@ export async function POST(req: NextRequest) {
       .setExpirationTime("14d")
       .sign(SECRET);
 
+    // For form submissions, redirect to dashboard
+    if (!contentType.includes("application/json")) {
+      const response = NextResponse.redirect(new URL("/dashboard", req.url));
+      response.cookies.set("kk_session", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 14,
+        path: "/",
+      });
+      return response;
+    }
+
+    // For JSON fetch
     const response = NextResponse.json({ success: true });
     response.cookies.set("kk_session", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 14,
       path: "/",
     });
-
     return response;
   } catch {
     return NextResponse.json({ success: false, error: "Er ging iets mis." }, { status: 500 });
