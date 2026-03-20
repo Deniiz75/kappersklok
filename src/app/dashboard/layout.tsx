@@ -14,6 +14,8 @@ import {
   Store,
   Users,
   ShieldCheck,
+  CreditCard,
+  Star,
 } from "lucide-react";
 
 const barberNav = [
@@ -26,6 +28,9 @@ const barberNav = [
 const adminNav = [
   { href: "/dashboard", label: "Overzicht", icon: LayoutDashboard },
   { href: "/dashboard/shops", label: "Kapperszaken", icon: Store },
+  { href: "/dashboard/betalingen", label: "Betalingen", icon: CreditCard },
+  { href: "/dashboard/alle-afspraken", label: "Afspraken", icon: CalendarDays },
+  { href: "/dashboard/reviews", label: "Reviews", icon: Star },
   { href: "/dashboard/berichten", label: "Berichten", icon: MessageSquare },
   { href: "/dashboard/gebruikers", label: "Gebruikers", icon: Users },
 ];

@@ -47,6 +47,7 @@ model Shop {
   businessHours  BusinessHours[]
   appointments   Appointment[]
   reviews        Review[]
+  payments       Payment[]
 }
 
 model Barber {
@@ -119,6 +120,18 @@ model Review {
   createdAt     DateTime @default(now())
 }
 
+model Payment {
+  id          String        @id @default(cuid())
+  shopId      String
+  shop        Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  amount      Int           // centen
+  description String
+  status      PaymentStatus @default(PAID)
+  period      String        // "2026-03" (maand)
+  paidAt      DateTime      @default(now())
+  createdAt   DateTime      @default(now())
+}
+
 model ContactMessage {
   id        String   @id @default(cuid())
   name      String
@@ -138,6 +151,13 @@ enum ShopStatus {
 enum Role {
   ADMIN
   BARBER
+}
+
+enum PaymentStatus {
+  PAID
+  PENDING
+  FAILED
+  REFUNDED
 }
 
 enum AppointmentStatus {
