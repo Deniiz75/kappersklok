@@ -7,7 +7,12 @@ import { CalendarDays, Users, Scissors, TrendingUp, Store, MessageSquare, Shield
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const session = await getSession();
+  let session;
+  try {
+    session = await getSession();
+  } catch {
+    redirect("/login");
+  }
   if (!session) redirect("/login");
 
   const isAdmin = session.role === "ADMIN";

@@ -20,16 +20,22 @@ export default function LoginPage() {
       password: (form.elements.namedItem("password") as HTMLInputElement).value,
     };
 
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    const result = await res.json();
-    if (result.success) {
-      router.push("/dashboard");
-    } else {
-      setError(result.error);
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (result.success) {
+        // Full reload to ensure cookie is picked up by server components
+        window.location.href = "/dashboard";
+      } else {
+        setError(result.error);
+        setStatus("error");
+      }
+    } catch {
+      setError("Kan geen verbinding maken. Probeer het later opnieuw.");
       setStatus("error");
     }
   }

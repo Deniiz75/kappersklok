@@ -41,13 +41,24 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getSession();
+  let session;
+  try {
+    session = await getSession();
+  } catch {
+    redirect("/login");
+  }
   if (!session) redirect("/login");
 
   const isAdmin = session.role === "ADMIN";
-  const shop = isAdmin ? null : await getShopByUserId(session.userId);
-
-  if (!isAdmin && !shop) redirect("/");
+  let shop = null;
+  if (!isAdmin) {
+    try {
+      shop = await getShopByUserId(session.userId);
+    } catch {
+      /* shop stays null */
+    }
+    if (!shop) redirect("/");
+  }
 
   const navItems = isAdmin ? adminNav : barberNav;
   const label = isAdmin ? "Beheerder" : shop?.name || "";
