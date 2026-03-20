@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { sendEmail, bookingConfirmationEmail, barberNotificationEmail } from "@/lib/email";
 
 const bookingSchema = z.object({
   shopId: z.string().min(1),
@@ -29,7 +30,6 @@ export async function createAppointment(data: unknown): Promise<BookingResult> {
   const d = parsed.data;
 
   try {
-    // Check for conflicting appointment
     const existing = await prisma.appointment.findFirst({
       where: {
         barberId: d.barberId,
@@ -56,10 +56,68 @@ export async function createAppointment(data: unknown): Promise<BookingResult> {
         customerPhone: d.customerPhone || null,
         notes: d.notes || null,
       },
+      include: {
+        shop: { select: { name: true, email: true } },
+        barber: { select: { name: true } },
+        service: { select: { name: true } },
+      },
     });
+
+    // Send confirmation email to customer
+    const confirmEmail = bookingConfirmationEmail({
+      customerName: d.customerName,
+      shopName: appointment.shop.name,
+      serviceName: appointment.service.name,
+      date: d.date,
+      time: d.startTime,
+      barberName: appointment.barber.name,
+      cancelToken: appointment.cancelToken || appointment.id,
+    });
+    sendEmail({ to: d.customerEmail, ...confirmEmail }).catch(() => {});
+
+    // Send notification to barber/shop
+    const notifyEmail = barberNotificationEmail({
+      customerName: d.customerName,
+      serviceName: appointment.service.name,
+      date: d.date,
+      time: d.startTime,
+      barberName: appointment.barber.name,
+      customerPhone: d.customerPhone,
+    });
+    sendEmail({ to: appointment.shop.email, ...notifyEmail }).catch(() => {});
 
     return { success: true, appointmentId: appointment.id };
   } catch {
     return { success: false, error: "Er ging iets mis. Probeer het later opnieuw." };
+  }
+}
+
+export async function cancelAppointment(token: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const appointment = await prisma.appointment.findFirst({
+      where: { cancelToken: token, status: "CONFIRMED" },
+    });
+
+    if (!appointment) {
+      return { success: false, error: "Afspraak niet gevonden of al geannuleerd." };
+    }
+
+    // Check if within 2 hours of appointment
+    const appointmentDateTime = new Date(`${appointment.date.toISOString().split("T")[0]}T${appointment.startTime}:00`);
+    const now = new Date();
+    const hoursUntil = (appointmentDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+    if (hoursUntil < 2) {
+      return { success: false, error: "Annuleren is niet meer mogelijk binnen 2 uur voor de afspraak. Neem contact op met uw kapper." };
+    }
+
+    await prisma.appointment.update({
+      where: { id: appointment.id },
+      data: { status: "CANCELLED" },
+    });
+
+    return { success: true };
+  } catch {
+    return { success: false, error: "Er ging iets mis." };
   }
 }

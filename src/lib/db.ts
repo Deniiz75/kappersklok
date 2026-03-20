@@ -84,11 +84,26 @@ export async function getShopBySlug(slug: string) {
     .eq("shopId", shop.id)
     .order("dayOfWeek");
 
+  const { data: reviews } = await supabase
+    .from("Review")
+    .select("id, customerName, rating, comment, createdAt")
+    .eq("shopId", shop.id)
+    .eq("approved", true)
+    .order("createdAt", { ascending: false })
+    .limit(20);
+
+  const reviewList = reviews || [];
+  const avgRating = reviewList.length > 0
+    ? reviewList.reduce((sum, r) => sum + r.rating, 0) / reviewList.length
+    : 0;
+
   return {
     ...shop,
     barbers: barbers || [],
     services: services || [],
     businessHours: businessHours || [],
+    reviews: reviewList,
+    avgRating,
   };
 }
 

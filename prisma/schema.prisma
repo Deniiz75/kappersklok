@@ -46,6 +46,7 @@ model Shop {
   services       Service[]
   businessHours  BusinessHours[]
   appointments   Appointment[]
+  reviews        Review[]
 }
 
 model Barber {
@@ -61,8 +62,8 @@ model Barber {
 model Service {
   id           String        @id @default(cuid())
   name         String
-  duration     Int           // minuten
-  price        Int           // centen (€29.50 = 2950)
+  duration     Int
+  price        Int
   shopId       String
   shop         Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
   active       Boolean       @default(true)
@@ -72,12 +73,12 @@ model Service {
 }
 
 model BusinessHours {
-  id        String @id @default(cuid())
+  id        String  @id @default(cuid())
   shopId    String
-  shop      Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  dayOfWeek Int    // 0=zondag, 1=maandag ... 6=zaterdag
-  openTime  String // "09:00"
-  closeTime String // "18:00"
+  shop      Shop    @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  dayOfWeek Int
+  openTime  String
+  closeTime String
   closed    Boolean @default(false)
 
   @@unique([shopId, dayOfWeek])
@@ -92,15 +93,30 @@ model Appointment {
   serviceId     String
   service       Service           @relation(fields: [serviceId], references: [id])
   date          DateTime          @db.Date
-  startTime     String            // "14:30"
-  endTime       String            // "15:00"
+  startTime     String
+  endTime       String
   customerName  String
   customerEmail String
   customerPhone String?
   status        AppointmentStatus @default(CONFIRMED)
   notes         String?
+  cancelToken   String?           @unique @default(cuid())
+  recurring     Boolean           @default(false)
+  recurringWeeks Int?
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
+}
+
+model Review {
+  id            String   @id @default(cuid())
+  shopId        String
+  shop          Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  customerName  String
+  customerEmail String
+  rating        Int      // 1-5
+  comment       String?
+  approved      Boolean  @default(true)
+  createdAt     DateTime @default(now())
 }
 
 model ContactMessage {

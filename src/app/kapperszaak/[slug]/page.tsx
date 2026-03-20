@@ -5,7 +5,8 @@ import { HeroBanner } from "@/components/hero-banner";
 import { LocalBusinessSchema } from "@/components/json-ld";
 import { ShopMonogram } from "@/components/shop-monogram";
 import { BookingWizard } from "@/components/booking-wizard";
-import { MapPin, Phone, Instagram, Clock, Euro } from "lucide-react";
+import { ReviewSection } from "@/components/review-section";
+import { MapPin, Phone, Instagram, Clock, Star } from "lucide-react";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -45,7 +46,10 @@ export default async function KapperszaakPage({ params }: Props) {
         phone={shop.phone}
         slug={slug}
       />
-      <HeroBanner title={shop.name} subtitle={shop.city || undefined} />
+      <HeroBanner
+        title={shop.name}
+        subtitle={shop.city ? `${shop.city}${shop.avgRating > 0 ? ` — ★ ${shop.avgRating.toFixed(1)}` : ""}` : undefined}
+      />
 
       <section className="py-12">
         <div className="mx-auto max-w-4xl px-4">
@@ -152,6 +156,15 @@ export default async function KapperszaakPage({ params }: Props) {
                   </div>
                 </div>
               )}
+
+              {/* Reviews */}
+              <div className="mt-6">
+                <ReviewSection
+                  shopId={shop.id}
+                  reviews={shop.reviews}
+                  avgRating={shop.avgRating}
+                />
+              </div>
             </div>
           </div>
         </div>
