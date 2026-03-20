@@ -1,7 +1,7 @@
 "use client";
 
-import type { Metadata } from "next";
 import { useState } from "react";
+import { submitContactForm } from "@/lib/actions";
 import {
   Accordion,
   AccordionContent,
@@ -53,11 +53,27 @@ const faqItems = [
 ];
 
 export default function ContactPage() {
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [error, setError] = useState("");
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSubmitted(true);
+    setStatus("loading");
+    const form = e.currentTarget;
+    const data = {
+      name: (form.elements.namedItem("name") as HTMLInputElement).value,
+      email: (form.elements.namedItem("email") as HTMLInputElement).value,
+      phone: (form.elements.namedItem("phone") as HTMLInputElement).value || undefined,
+      message: (form.elements.namedItem("message") as HTMLTextAreaElement).value,
+    };
+
+    const result = await submitContactForm(data);
+    if (result.success) {
+      setStatus("success");
+    } else {
+      setError(result.error);
+      setStatus("error");
+    }
   }
 
   return (
@@ -88,7 +104,7 @@ export default function ContactPage() {
             subtitle="Staat uw vraag er niet bij?"
           />
 
-          {submitted ? (
+          {status === "success" ? (
             <div className="mt-8 rounded-lg border border-gold/30 bg-gold/5 p-6 text-center">
               <p className="font-semibold text-gold">Bericht verzonden!</p>
               <p className="mt-2 text-sm text-muted-foreground">
@@ -102,54 +118,36 @@ export default function ContactPage() {
                   <label htmlFor="name" className="mb-1 block text-sm font-medium">
                     Naam
                   </label>
-                  <Input
-                    id="name"
-                    name="name"
-                    required
-                    className="border-border bg-background"
-                  />
+                  <Input id="name" name="name" required className="border-border bg-background" />
                 </div>
                 <div>
                   <label htmlFor="phone" className="mb-1 block text-sm font-medium">
                     Telefoon
                   </label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    className="border-border bg-background"
-                  />
+                  <Input id="phone" name="phone" type="tel" className="border-border bg-background" />
                 </div>
               </div>
               <div>
                 <label htmlFor="email" className="mb-1 block text-sm font-medium">
                   E-mailadres
                 </label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  className="border-border bg-background"
-                />
+                <Input id="email" name="email" type="email" required className="border-border bg-background" />
               </div>
               <div>
                 <label htmlFor="message" className="mb-1 block text-sm font-medium">
                   Bericht
                 </label>
-                <Textarea
-                  id="message"
-                  name="message"
-                  rows={5}
-                  required
-                  className="border-border bg-background"
-                />
+                <Textarea id="message" name="message" rows={5} required className="border-border bg-background" />
               </div>
+              {status === "error" && (
+                <p className="text-sm text-destructive">{error}</p>
+              )}
               <Button
                 type="submit"
+                disabled={status === "loading"}
                 className="w-full bg-gold text-background hover:bg-gold-hover font-semibold"
               >
-                Verstuur bericht
+                {status === "loading" ? "Verzenden..." : "Verstuur bericht"}
               </Button>
               <p className="text-xs text-muted-foreground text-center">
                 Let op: u verstuurt hiermee een bericht naar Kappersklok en niet naar uw kapper.
