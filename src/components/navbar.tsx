@@ -7,6 +7,7 @@ import { ButtonLink } from "@/components/button-link";
 import { BrandLink } from "@/components/brand-link";
 
 const navLinks = [
+  { href: "/kapper-zoeken", label: "Kapper Zoeken" },
   { href: "/informatie", label: "Info" },
   { href: "/contact", label: "Contact" },
 ];

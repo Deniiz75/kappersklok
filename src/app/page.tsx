@@ -118,10 +118,13 @@ export default function Home() {
               placeholder="Voer je stad in..."
               className="h-12 border-border bg-surface text-foreground placeholder:text-muted-foreground"
             />
-            <Button className="h-12 bg-gold px-6 text-background hover:bg-gold-hover font-semibold whitespace-nowrap">
+            <ButtonLink
+              href="/kapper-zoeken"
+              className="h-12 bg-gold px-6 text-background hover:bg-gold-hover font-semibold whitespace-nowrap"
+            >
               <Search className="mr-2 h-4 w-4" />
               Vind mijn kapper
-            </Button>
+            </ButtonLink>
           </div>
         </div>
       </section>
