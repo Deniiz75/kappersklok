@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { ButtonLink } from "@/components/button-link";
+import { Logo } from "@/components/logo";
 
 const navLinks = [
   { href: "/informatie", label: "Info" },
@@ -18,17 +18,15 @@ export function Navbar() {
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2.5">
-          <Image
-            src="/logo.jpg"
-            alt="Kappersklok logo"
-            width={40}
-            height={40}
-            className="rounded-full"
-            priority
-          />
-          <span className="font-heading text-xl font-bold tracking-tight text-foreground">
-            Kappersklok
-          </span>
+          <Logo size={38} />
+          <div className="flex flex-col leading-none">
+            <span className="font-heading text-lg font-bold tracking-tight text-foreground">
+              Kappersklok
+            </span>
+            <span className="hidden text-[9px] tracking-[0.15em] uppercase text-gold/60 sm:block">
+              voor haar &amp; hem
+            </span>
+          </div>
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">

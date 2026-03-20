@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   Search,
@@ -18,6 +17,7 @@ import { ButtonLink } from "@/components/button-link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { SectionHeading } from "@/components/section-heading";
+import { Logo } from "@/components/logo";
 
 const steps = [
   {
@@ -236,14 +236,8 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-            <div className="flex h-48 w-48 items-center justify-center rounded-2xl bg-gold/10">
-              <Image
-                src="/logo.jpg"
-                alt="Kappersklok app"
-                width={160}
-                height={160}
-                className="rounded-2xl"
-              />
+            <div className="flex h-48 w-48 items-center justify-center rounded-2xl bg-gold/5 border border-gold/20">
+              <Logo size={120} />
             </div>
           </div>
         </div>
