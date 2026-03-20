@@ -16,38 +16,51 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <div className="hidden sm:block">
-          <BrandLink logoSize={36} wordmarkSize="md" showTagline />
-        </div>
-        <div className="sm:hidden">
-          <BrandLink logoSize={32} wordmarkSize="sm" />
+      <div className="mx-auto flex h-16 max-w-6xl items-center px-4">
+        {/* Left: hamburger on mobile, nav links on desktop */}
+        <div className="flex flex-1 items-center md:gap-6">
+          <button
+            className="mr-2 text-foreground md:hidden"
+            onClick={() => setOpen(!open)}
+            aria-label="Menu"
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+          <nav className="hidden items-center gap-6 md:flex">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
         </div>
 
-        <nav className="hidden items-center gap-6 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
-          <ButtonLink href="/registreren" className="bg-gold text-background hover:bg-gold-hover font-semibold">
+        {/* Center: brand logo + wordmark */}
+        <div className="flex items-center justify-center">
+          <div className="hidden sm:block">
+            <BrandLink logoSize={36} wordmarkSize="md" showTagline />
+          </div>
+          <div className="sm:hidden">
+            <BrandLink logoSize={32} wordmarkSize="sm" />
+          </div>
+        </div>
+
+        {/* Right: CTA on desktop, spacer on mobile */}
+        <div className="flex flex-1 items-center justify-end">
+          <ButtonLink
+            href="/registreren"
+            className="hidden bg-gold text-background hover:bg-gold-hover font-semibold md:inline-flex"
+          >
             Kapperszaak Registreren
           </ButtonLink>
-        </nav>
-
-        <button
-          className="md:hidden text-foreground"
-          onClick={() => setOpen(!open)}
-          aria-label="Menu"
-        >
-          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        </div>
       </div>
 
+      {/* Mobile menu */}
       {open && (
         <div className="border-t border-border bg-background px-4 pb-4 md:hidden">
           <nav className="flex flex-col gap-3 pt-3">
@@ -61,7 +74,11 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
-            <ButtonLink href="/registreren" className="bg-gold text-background hover:bg-gold-hover font-semibold w-full" onClick={() => setOpen(false)}>
+            <ButtonLink
+              href="/registreren"
+              className="bg-gold text-background hover:bg-gold-hover font-semibold w-full"
+              onClick={() => setOpen(false)}
+            >
               Kapperszaak Registreren
             </ButtonLink>
           </nav>
