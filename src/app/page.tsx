@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   Search,
@@ -236,7 +237,13 @@ export default function Home() {
               </div>
             </div>
             <div className="flex h-48 w-48 items-center justify-center rounded-2xl bg-gold/10">
-              <Scissors className="h-20 w-20 text-gold/40" />
+              <Image
+                src="/logo.jpg"
+                alt="Kappersklok app"
+                width={160}
+                height={160}
+                className="rounded-2xl"
+              />
             </div>
           </div>
         </div>

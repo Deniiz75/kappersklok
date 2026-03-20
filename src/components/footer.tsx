@@ -1,5 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Scissors, Instagram } from "lucide-react";
+import { Instagram } from "lucide-react";
 
 const footerLinks = [
   { href: "/registreren", label: "Registreren informatie" },
@@ -13,10 +14,16 @@ export function Footer() {
     <footer className="border-t border-border bg-surface">
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="flex flex-col items-center gap-8 md:flex-row md:justify-between">
-          <div className="flex items-center gap-2">
-            <Scissors className="h-5 w-5 text-gold" />
+          <Link href="/" className="flex items-center gap-2.5">
+            <Image
+              src="/logo.jpg"
+              alt="Kappersklok logo"
+              width={36}
+              height={36}
+              className="rounded-full"
+            />
             <span className="font-heading text-lg font-bold">Kappersklok</span>
-          </div>
+          </Link>
 
           <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2">
             {footerLinks.map((link) => (

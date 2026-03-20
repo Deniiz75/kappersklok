@@ -21,10 +21,29 @@ export const metadata: Metadata = {
   },
   description:
     "Makkelijk en snel een afspraak maken bij jouw kapper. Zonder registratie, binnen enkele seconden geboekt.",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
   openGraph: {
     type: "website",
     locale: "nl_NL",
     siteName: "Kappersklok",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Kappersklok — Online Kapper Afspraak Maken",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kappersklok — Online Kapper Afspraak Maken",
+    description:
+      "Makkelijk en snel een afspraak maken bij jouw kapper. Zonder registratie, binnen enkele seconden geboekt.",
+    images: ["/og-image.jpg"],
   },
 };
 
