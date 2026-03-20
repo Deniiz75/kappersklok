@@ -59,6 +59,17 @@ export async function registerShop(data: unknown): Promise<ActionResult> {
       return { success: false, error: "Dit e-mailadres is al geregistreerd." };
     }
 
+    // Create user account
+    const passwordHash = await bcrypt.hash(d.password, 10);
+    const user = await prisma.user.create({
+      data: {
+        email: d.email,
+        passwordHash,
+        role: "BARBER",
+      },
+    });
+
+    // Create shop linked to user
     await prisma.shop.create({
       data: {
         name: d.shopName,
@@ -80,7 +91,15 @@ export async function registerShop(data: unknown): Promise<ActionResult> {
         privateDomain: d.privateDomain || null,
         barbersCount: d.barbersCount,
         welcomePackage: d.welcomePackage,
+        userId: user.id,
       },
+    });
+
+    // Auto-login after registration
+    await createSession({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
     });
 
     return { success: true };

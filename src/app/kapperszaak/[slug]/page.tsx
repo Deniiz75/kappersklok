@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getShopBySlug } from "@/lib/db";
 import { HeroBanner } from "@/components/hero-banner";
+import { LocalBusinessSchema } from "@/components/json-ld";
 import { MapPin, Phone, Instagram } from "lucide-react";
 
 interface Props {
@@ -29,6 +30,14 @@ export default async function KapperszaakPage({ params }: Props) {
 
   return (
     <>
+      <LocalBusinessSchema
+        name={shop.name}
+        city={shop.city}
+        street={shop.street}
+        postalCode={shop.postalCode}
+        phone={shop.phone}
+        slug={slug}
+      />
       <HeroBanner title={shop.name} subtitle={shop.city || undefined} />
       <section className="py-16">
         <div className="mx-auto max-w-2xl px-4">

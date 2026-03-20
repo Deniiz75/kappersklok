@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { submitContactForm } from "@/lib/actions";
+import { FAQPageSchema } from "@/components/json-ld";
 import {
   Accordion,
   AccordionContent,
@@ -78,6 +79,7 @@ export default function ContactPage() {
 
   return (
     <>
+      <FAQPageSchema items={faqItems} />
       <HeroBanner title="Contact" />
 
       <section className="py-16">

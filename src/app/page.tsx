@@ -16,11 +16,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/button-link";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { SectionHeading } from "@/components/section-heading";
+import { SearchBar } from "@/components/search-bar";
 import { Logo } from "@/components/logo";
 import { ShopMonogram } from "@/components/shop-monogram";
 import { getActiveShops } from "@/lib/db";
+import { OrganizationSchema } from "@/components/json-ld";
 
 export const dynamic = "force-dynamic";
 
@@ -52,6 +53,7 @@ export default async function Home() {
 
   return (
     <>
+      <OrganizationSchema />
       {/* Hero */}
       <section className="relative overflow-hidden py-24 md:py-32">
         <div className="absolute inset-0 bg-gradient-to-b from-gold/5 via-transparent to-transparent" />
@@ -64,20 +66,7 @@ export default async function Home() {
             Makkelijk en snel een afspraak maken bij jouw lokale kapper. Zonder
             registratie, zonder gedoe.
           </p>
-          <div className="mx-auto mt-10 flex max-w-md flex-col gap-3 sm:flex-row">
-            <Input
-              type="text"
-              placeholder="Voer je stad in..."
-              className="h-12 border-border bg-surface text-foreground placeholder:text-muted-foreground"
-            />
-            <ButtonLink
-              href="/kapper-zoeken"
-              className="h-12 bg-gold px-6 text-background hover:bg-gold-hover font-semibold whitespace-nowrap"
-            >
-              <Search className="mr-2 h-4 w-4" />
-              Vind mijn kapper
-            </ButtonLink>
-          </div>
+          <SearchBar />
 
           {/* Trust counter */}
           <p className="mt-8 text-sm text-muted-foreground">

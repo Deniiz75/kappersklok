@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getActiveShopsWithBarbers } from "@/lib/db";
-
-export const dynamic = "force-dynamic";
+import { SearchBar } from "@/components/search-bar";
 import { HeroBanner } from "@/components/hero-banner";
 import { ShopMonogram } from "@/components/shop-monogram";
 import { MapPin, Users, ArrowRight } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Kapper Zoeken",
@@ -13,67 +14,102 @@ export const metadata: Metadata = {
     "Vind een kapper bij jou in de buurt. Bekijk alle aangesloten kappers en barbershops op Kappersklok.",
 };
 
-export default async function KapperZoekenPage() {
-  const shops = await getActiveShopsWithBarbers();
+interface Props {
+  searchParams: Promise<{ q?: string }>;
+}
 
-  const cities = [...new Set(shops.map((s) => s.city).filter(Boolean))].sort();
+export default async function KapperZoekenPage({ searchParams }: Props) {
+  const { q } = await searchParams;
+  const allShops = await getActiveShopsWithBarbers();
+
+  const query = q?.toLowerCase().trim() || "";
+  const shops = query
+    ? allShops.filter(
+        (s) =>
+          s.city?.toLowerCase().includes(query) ||
+          s.name.toLowerCase().includes(query)
+      )
+    : allShops;
+
+  const cities = [...new Set(allShops.map((s) => s.city).filter(Boolean))].sort();
 
   return (
     <>
       <HeroBanner
-        title="Vind jouw kapper"
-        subtitle={`${shops.length} kappers door heel Nederland`}
+        title={query ? `Kappers in "${q}"` : "Vind jouw kapper"}
+        subtitle={`${shops.length} ${query ? "resultaten" : "kappers door heel Nederland"}`}
       />
 
-      <section className="py-12">
+      <section className="py-8">
+        <div className="mx-auto max-w-xl px-4">
+          <SearchBar />
+        </div>
+      </section>
+
+      <section className="pb-12">
         <div className="mx-auto max-w-6xl px-4">
           {/* City chips */}
           <div className="mb-10 flex flex-wrap justify-center gap-2">
             {cities.map((city) => {
-              const count = shops.filter((s) => s.city === city).length;
+              const count = allShops.filter((s) => s.city === city).length;
+              const isActive = query === city?.toLowerCase();
               return (
-                <span
+                <Link
                   key={city}
-                  className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-muted-foreground"
+                  href={isActive ? "/kapper-zoeken" : `/kapper-zoeken?q=${encodeURIComponent(city!)}`}
+                  className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                    isActive
+                      ? "border-gold bg-gold/10 text-gold"
+                      : "border-border bg-surface text-muted-foreground hover:border-gold/30"
+                  }`}
                 >
                   {city}
                   <span className="ml-1 text-gold">{count}</span>
-                </span>
+                </Link>
               );
             })}
           </div>
 
-          {/* Shop grid */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {shops.map((shop, i) => (
-              <Link
-                key={shop.id}
-                href={`/kapperszaak/${shop.slug}`}
-                className="group relative overflow-hidden rounded-xl border border-border bg-surface p-5 transition-all hover:border-gold/40 hover:bg-surface/80"
-                style={{ animationDelay: `${Math.min(i * 30, 600)}ms` }}
-              >
-                <div className="flex items-start gap-4">
-                  <ShopMonogram name={shop.name} size={56} />
-                  <div className="flex-1 min-w-0">
-                    <h3 className="truncate font-heading text-sm font-bold group-hover:text-gold transition-colors">
-                      {shop.name}
-                    </h3>
-                    {shop.city && (
+          {shops.length === 0 ? (
+            <div className="py-16 text-center">
+              <p className="text-lg text-muted-foreground">
+                Geen kappers gevonden{query ? ` voor "${q}"` : ""}
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Probeer een andere stad of bekijk alle kappers
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {shops.map((shop) => (
+                <Link
+                  key={shop.id}
+                  href={`/kapperszaak/${shop.slug}`}
+                  className="group relative overflow-hidden rounded-xl border border-border bg-surface p-5 transition-all hover:border-gold/40 hover:bg-surface/80"
+                >
+                  <div className="flex items-start gap-4">
+                    <ShopMonogram name={shop.name} size={56} />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="truncate font-heading text-sm font-bold group-hover:text-gold transition-colors">
+                        {shop.name}
+                      </h3>
+                      {shop.city && (
+                        <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                          <MapPin className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{shop.city}</span>
+                        </div>
+                      )}
                       <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                        <MapPin className="h-3 w-3 shrink-0" />
-                        <span className="truncate">{shop.city}</span>
+                        <Users className="h-3 w-3 shrink-0" />
+                        <span>{shop.barbers.length} kappers</span>
                       </div>
-                    )}
-                    <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                      <Users className="h-3 w-3 shrink-0" />
-                      <span>{shop.barbers.length} kappers</span>
                     </div>
+                    <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-hover:text-gold" />
                   </div>
-                  <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-hover:text-gold" />
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </>

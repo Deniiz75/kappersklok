@@ -26,6 +26,7 @@ interface Step1Data {
   phone: string;
   privatePhone: string;
   email: string;
+  password: string;
   instagram: string;
   howFoundUs: string;
 }
@@ -53,6 +54,7 @@ export default function AanmeldenPage() {
       phone: get("shopnumber"),
       privatePhone: get("private_phone"),
       email: get("email"),
+      password: get("password"),
       instagram: get("instagram"),
       howFoundUs: get("how_find_us"),
     });
@@ -196,6 +198,9 @@ export default function AanmeldenPage() {
                 </div>
                 <Field label="E-mailadres">
                   <Input name="email" type="email" placeholder="E-mail" required defaultValue={step1Data?.email} className="border-border bg-background" />
+                </Field>
+                <Field label="Wachtwoord (voor uw account)">
+                  <Input name="password" type="password" placeholder="Minimaal 6 tekens" required minLength={6} className="border-border bg-background" />
                 </Field>
                 <Field label="Instagram">
                   <Input name="instagram" placeholder="@gebruikersnaam" defaultValue={step1Data?.instagram} className="border-border bg-background" />
