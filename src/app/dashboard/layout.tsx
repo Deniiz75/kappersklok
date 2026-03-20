@@ -20,20 +20,20 @@ import {
 } from "lucide-react";
 
 const barberNav = [
-  { href: "/dashboard", label: "Overzicht", shortLabel: "Home", icon: LayoutDashboard },
-  { href: "/dashboard/afspraken", label: "Afspraken", shortLabel: "Afspraken", icon: CalendarDays },
-  { href: "/dashboard/diensten", label: "Diensten", shortLabel: "Diensten", icon: ScissorsIcon },
-  { href: "/dashboard/instellingen", label: "Instellingen", shortLabel: "Instelling", icon: Settings },
+  { href: "/dashboard", label: "Overzicht", shortLabel: "Home", icon: LayoutDashboard, iconName: "LayoutDashboard" },
+  { href: "/dashboard/afspraken", label: "Afspraken", shortLabel: "Afspraken", icon: CalendarDays, iconName: "CalendarDays" },
+  { href: "/dashboard/diensten", label: "Diensten", shortLabel: "Diensten", icon: ScissorsIcon, iconName: "Scissors" },
+  { href: "/dashboard/instellingen", label: "Instellingen", shortLabel: "Instelling", icon: Settings, iconName: "Settings" },
 ];
 
 const adminNav = [
-  { href: "/dashboard", label: "Overzicht", shortLabel: "Home", icon: LayoutDashboard },
-  { href: "/dashboard/shops", label: "Kapperszaken", shortLabel: "Shops", icon: Store },
-  { href: "/dashboard/betalingen", label: "Betalingen", shortLabel: "Betaling", icon: CreditCard },
-  { href: "/dashboard/alle-afspraken", label: "Alle afspraken", shortLabel: "Afspraken", icon: CalendarDays },
-  { href: "/dashboard/reviews", label: "Reviews beheer", shortLabel: "Reviews", icon: Star },
-  { href: "/dashboard/berichten", label: "Berichten", shortLabel: "Berichten", icon: MessageSquare },
-  { href: "/dashboard/gebruikers", label: "Gebruikers", shortLabel: "Users", icon: Users },
+  { href: "/dashboard", label: "Overzicht", shortLabel: "Home", icon: LayoutDashboard, iconName: "LayoutDashboard" },
+  { href: "/dashboard/shops", label: "Kapperszaken", shortLabel: "Shops", icon: Store, iconName: "Store" },
+  { href: "/dashboard/betalingen", label: "Betalingen", shortLabel: "Betaling", icon: CreditCard, iconName: "CreditCard" },
+  { href: "/dashboard/alle-afspraken", label: "Alle afspraken", shortLabel: "Afspraken", icon: CalendarDays, iconName: "CalendarDays" },
+  { href: "/dashboard/reviews", label: "Reviews beheer", shortLabel: "Reviews", icon: Star, iconName: "Star" },
+  { href: "/dashboard/berichten", label: "Berichten", shortLabel: "Berichten", icon: MessageSquare, iconName: "MessageSquare" },
+  { href: "/dashboard/gebruikers", label: "Gebruikers", shortLabel: "Users", icon: Users, iconName: "Users" },
 ];
 
 export default async function DashboardLayout({
@@ -126,7 +126,7 @@ export default async function DashboardLayout({
         </header>
 
         {/* Mobile bottom nav */}
-        <MobileNav items={navItems} />
+        <MobileNav items={navItems.map(({ href, label, shortLabel, iconName }) => ({ href, label, shortLabel, iconName }))} />
 
         {/* Content */}
         <main className="flex-1 overflow-auto p-4 pb-24 md:p-6 md:pb-6">
