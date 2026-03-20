@@ -7,19 +7,27 @@ import { Wordmark } from "@/components/wordmark";
 import {
   CalendarDays,
   Scissors as ScissorsIcon,
-  Clock,
   Settings,
   MessageSquare,
   LogOut,
   LayoutDashboard,
+  Store,
+  Users,
+  ShieldCheck,
 } from "lucide-react";
 
-const navItems = [
+const barberNav = [
   { href: "/dashboard", label: "Overzicht", icon: LayoutDashboard },
   { href: "/dashboard/afspraken", label: "Afspraken", icon: CalendarDays },
   { href: "/dashboard/diensten", label: "Diensten", icon: ScissorsIcon },
   { href: "/dashboard/instellingen", label: "Instellingen", icon: Settings },
+];
+
+const adminNav = [
+  { href: "/dashboard", label: "Overzicht", icon: LayoutDashboard },
+  { href: "/dashboard/shops", label: "Kapperszaken", icon: Store },
   { href: "/dashboard/berichten", label: "Berichten", icon: MessageSquare },
+  { href: "/dashboard/gebruikers", label: "Gebruikers", icon: Users },
 ];
 
 export default async function DashboardLayout({
@@ -30,21 +38,30 @@ export default async function DashboardLayout({
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const shop = await getShopByUserId(session.userId);
-  if (!shop) redirect("/");
+  const isAdmin = session.role === "ADMIN";
+  const shop = isAdmin ? null : await getShopByUserId(session.userId);
+
+  if (!isAdmin && !shop) redirect("/");
+
+  const navItems = isAdmin ? adminNav : barberNav;
+  const label = isAdmin ? "Beheerder" : shop?.name || "";
+  const sublabel = isAdmin ? "Admin Panel" : shop?.city || "";
 
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <aside className="hidden w-64 shrink-0 border-r border-border bg-surface md:block">
+      <aside className="hidden w-64 shrink-0 border-r border-border bg-surface md:flex md:flex-col">
         <div className="flex h-16 items-center gap-3 border-b border-border px-4">
           <Logo size={28} />
           <Wordmark size="sm" />
         </div>
-        <div className="p-3">
+        <div className="flex-1 p-3">
           <div className="mb-4 rounded-lg bg-gold/5 border border-gold/20 p-3">
-            <p className="text-sm font-semibold truncate">{shop.name}</p>
-            <p className="text-xs text-muted-foreground truncate">{shop.city}</p>
+            <div className="flex items-center gap-2">
+              {isAdmin && <ShieldCheck className="h-4 w-4 text-gold shrink-0" />}
+              <p className="text-sm font-semibold truncate">{label}</p>
+            </div>
+            <p className="text-xs text-muted-foreground truncate">{sublabel}</p>
           </div>
           <nav className="space-y-1">
             {navItems.map((item) => (
@@ -59,7 +76,7 @@ export default async function DashboardLayout({
             ))}
           </nav>
         </div>
-        <div className="absolute bottom-4 left-0 w-64 px-3">
+        <div className="border-t border-border p-3">
           <form action="/api/logout" method="POST">
             <button
               type="submit"
@@ -77,13 +94,14 @@ export default async function DashboardLayout({
         <header className="flex h-14 items-center justify-between border-b border-border bg-surface px-4 md:hidden">
           <div className="flex items-center gap-2">
             <Logo size={24} />
-            <span className="text-sm font-semibold">{shop.name}</span>
+            <span className="text-sm font-semibold">{label}</span>
+            {isAdmin && <ShieldCheck className="h-3.5 w-3.5 text-gold" />}
           </div>
         </header>
 
         {/* Mobile bottom nav */}
         <nav className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-border bg-surface md:hidden">
-          {navItems.slice(0, 4).map((item) => (
+          {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
