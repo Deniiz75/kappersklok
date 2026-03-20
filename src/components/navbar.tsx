@@ -4,8 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { ButtonLink } from "@/components/button-link";
-import { Logo } from "@/components/logo";
-import { Wordmark } from "@/components/wordmark";
+import { BrandLink } from "@/components/brand-link";
 
 const navLinks = [
   { href: "/informatie", label: "Info" },
@@ -18,11 +17,12 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-3">
-          <Logo size={36} />
-          <Wordmark size="md" showTagline className="hidden sm:flex" />
-          <Wordmark size="sm" className="sm:hidden" />
-        </Link>
+        <div className="hidden sm:block">
+          <BrandLink logoSize={36} wordmarkSize="md" showTagline />
+        </div>
+        <div className="sm:hidden">
+          <BrandLink logoSize={32} wordmarkSize="sm" />
+        </div>
 
         <nav className="hidden items-center gap-6 md:flex">
           {navLinks.map((link) => (
