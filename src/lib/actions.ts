@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/db";
 import { createSession } from "@/lib/auth";
 import { contactFormSchema, registrationSchema, loginSchema } from "@/lib/validations";
 import bcrypt from "bcryptjs";
@@ -14,14 +14,13 @@ export async function submitContactForm(data: unknown): Promise<ActionResult> {
   }
 
   try {
-    await prisma.contactMessage.create({
-      data: {
-        name: parsed.data.name,
-        email: parsed.data.email,
-        phone: parsed.data.phone || null,
-        message: parsed.data.message,
-      },
+    const { error } = await supabase.from("ContactMessage").insert({
+      name: parsed.data.name,
+      email: parsed.data.email,
+      phone: parsed.data.phone || null,
+      message: parsed.data.message,
     });
+    if (error) throw error;
     return { success: true };
   } catch {
     return { success: false, error: "Er ging iets mis. Probeer het later opnieuw." };
@@ -47,61 +46,53 @@ export async function registerShop(data: unknown): Promise<ActionResult> {
   let slug = generateSlug(d.shopName);
 
   try {
-    // Ensure unique slug
-    const existing = await prisma.shop.findUnique({ where: { slug } });
+    // Check unique slug
+    const { data: existing } = await supabase.from("Shop").select("id").eq("slug", slug).single();
     if (existing) {
       slug = `${slug}-${Date.now().toString(36)}`;
     }
 
     // Check duplicate email
-    const emailExists = await prisma.shop.findUnique({ where: { email: d.email } });
+    const { data: emailExists } = await supabase.from("Shop").select("id").eq("email", d.email).single();
     if (emailExists) {
       return { success: false, error: "Dit e-mailadres is al geregistreerd." };
     }
 
-    // Create user account
+    // Create user
     const passwordHash = await bcrypt.hash(d.password, 10);
-    const user = await prisma.user.create({
-      data: {
-        email: d.email,
-        passwordHash,
-        role: "BARBER",
-      },
-    });
+    const { data: user, error: userError } = await supabase
+      .from("User")
+      .insert({ email: d.email, passwordHash, role: "BARBER" })
+      .select("id, email, role")
+      .single();
+    if (userError || !user) throw userError;
 
-    // Create shop linked to user
-    await prisma.shop.create({
-      data: {
-        name: d.shopName,
-        slug,
-        contactName: d.contactName,
-        email: d.email,
-        phone: d.phone || null,
-        privatePhone: d.privatePhone || null,
-        kvkNumber: d.kvkNumber || null,
-        country: d.country,
-        street: d.street || null,
-        houseNumber: d.houseNumber || null,
-        city: d.city || null,
-        postalCode: d.postalCode || null,
-        instagram: d.instagram || null,
-        howFoundUs: d.howFoundUs || null,
-        language: d.language,
-        digibox: d.digibox,
-        privateDomain: d.privateDomain || null,
-        barbersCount: d.barbersCount,
-        welcomePackage: d.welcomePackage,
-        userId: user.id,
-      },
-    });
-
-    // Auto-login after registration
-    await createSession({
+    // Create shop
+    const { error: shopError } = await supabase.from("Shop").insert({
+      name: d.shopName,
+      slug,
+      contactName: d.contactName,
+      email: d.email,
+      phone: d.phone || null,
+      privatePhone: d.privatePhone || null,
+      kvkNumber: d.kvkNumber || null,
+      country: d.country,
+      street: d.street || null,
+      houseNumber: d.houseNumber || null,
+      city: d.city || null,
+      postalCode: d.postalCode || null,
+      instagram: d.instagram || null,
+      howFoundUs: d.howFoundUs || null,
+      language: d.language,
+      digibox: d.digibox,
+      privateDomain: d.privateDomain || null,
+      barbersCount: d.barbersCount,
+      welcomePackage: d.welcomePackage,
       userId: user.id,
-      email: user.email,
-      role: user.role,
     });
+    if (shopError) throw shopError;
 
+    await createSession({ userId: user.id, email: user.email, role: user.role });
     return { success: true };
   } catch {
     return { success: false, error: "Er ging iets mis bij de registratie." };
@@ -115,11 +106,13 @@ export async function loginAction(data: unknown): Promise<ActionResult> {
   }
 
   try {
-    const user = await prisma.user.findUnique({
-      where: { email: parsed.data.email },
-    });
+    const { data: user, error } = await supabase
+      .from("User")
+      .select("id, email, passwordHash, role")
+      .eq("email", parsed.data.email)
+      .single();
 
-    if (!user) {
+    if (error || !user) {
       return { success: false, error: "Onjuist e-mailadres of wachtwoord." };
     }
 
@@ -128,12 +121,7 @@ export async function loginAction(data: unknown): Promise<ActionResult> {
       return { success: false, error: "Onjuist e-mailadres of wachtwoord." };
     }
 
-    await createSession({
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-    });
-
+    await createSession({ userId: user.id, email: user.email, role: user.role });
     return { success: true };
   } catch {
     return { success: false, error: "Er ging iets mis. Probeer het later opnieuw." };

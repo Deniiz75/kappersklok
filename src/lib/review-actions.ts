@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/db";
 import { z } from "zod";
 
 const reviewSchema = z.object({
@@ -20,15 +20,14 @@ export async function submitReview(data: unknown): Promise<ReviewResult> {
   }
 
   try {
-    await prisma.review.create({
-      data: {
-        shopId: parsed.data.shopId,
-        customerName: parsed.data.customerName,
-        customerEmail: parsed.data.customerEmail,
-        rating: parsed.data.rating,
-        comment: parsed.data.comment || null,
-      },
+    const { error } = await supabase.from("Review").insert({
+      shopId: parsed.data.shopId,
+      customerName: parsed.data.customerName,
+      customerEmail: parsed.data.customerEmail,
+      rating: parsed.data.rating,
+      comment: parsed.data.comment || null,
     });
+    if (error) throw error;
     return { success: true };
   } catch {
     return { success: false, error: "Er ging iets mis. Probeer het later opnieuw." };
