@@ -19,12 +19,14 @@ import {
   Star,
   BarChart3,
   UserSearch,
+  Monitor,
 } from "lucide-react";
 
 const barberNav = [
   { href: "/dashboard", label: "Overzicht", shortLabel: "Home", icon: LayoutDashboard, iconName: "LayoutDashboard" },
   { href: "/dashboard/afspraken", label: "Afspraken", shortLabel: "Afspraken", icon: CalendarDays, iconName: "CalendarDays" },
   { href: "/dashboard/diensten", label: "Diensten", shortLabel: "Diensten", icon: ScissorsIcon, iconName: "Scissors" },
+  { href: "/dashboard/digibox", label: "Digi-box", shortLabel: "Digi-box", icon: Monitor, iconName: "Monitor" },
   { href: "/dashboard/instellingen", label: "Instellingen", shortLabel: "Instelling", icon: Settings, iconName: "Settings" },
 ];
 
