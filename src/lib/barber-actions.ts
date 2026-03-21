@@ -175,3 +175,32 @@ export async function barberDeleteService(serviceId: string) {
   if (error) return { success: false, error: "Kon dienst niet verwijderen." };
   return { success: true };
 }
+
+// --- Business Hours actions ---
+
+export async function barberUpdateBusinessHours(
+  hours: Array<{ dayOfWeek: number; openTime: string; closeTime: string; closed: boolean }>
+) {
+  const { shop } = await requireBarberShop();
+
+  for (const h of hours) {
+    const { error } = await supabase
+      .from("BusinessHours")
+      .upsert(
+        {
+          shopId: shop.id,
+          dayOfWeek: h.dayOfWeek,
+          openTime: h.openTime,
+          closeTime: h.closeTime,
+          closed: h.closed,
+        },
+        { onConflict: "shopId,dayOfWeek" }
+      );
+
+    if (error) {
+      return { success: false, error: "Kon openingstijden niet opslaan." };
+    }
+  }
+
+  return { success: true };
+}

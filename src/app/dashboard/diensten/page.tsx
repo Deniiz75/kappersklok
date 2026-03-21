@@ -6,6 +6,7 @@ import {
   barberCreateService,
   barberUpdateService,
   barberDeleteService,
+  barberUpdateBusinessHours,
 } from "@/lib/barber-actions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,10 @@ export default function DienstenPage() {
 
   // Delete confirmation
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Business hours edit state
+  const [editingHours, setEditingHours] = useState(false);
+  const [hoursForm, setHoursForm] = useState<BusinessHour[]>([]);
 
   // Action loading
   const [actionLoading, setActionLoading] = useState(false);
@@ -443,29 +448,131 @@ export default function DienstenPage() {
         )}
       </div>
 
-      {/* Business Hours (read-only) */}
+      {/* Business Hours */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold">Openingstijden</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Openingstijden</h2>
+          {!editingHours && (
+            <Button
+              size="sm"
+              onClick={() => {
+                setEditingHours(true);
+                setHoursForm(businessHours.map((h) => ({ ...h })));
+                setError(null);
+              }}
+              className="h-8 bg-gold/10 text-gold hover:bg-gold/20 text-xs px-3"
+            >
+              <Pencil className="h-3 w-3 mr-1" /> Bewerken
+            </Button>
+          )}
+        </div>
         <div className="mt-3">
-          <Card className="border-border bg-surface">
+          <Card className={`bg-surface ${editingHours ? "border-gold/30" : "border-border"}`}>
             <CardContent className="p-0">
-              {businessHours.map((h, i) => (
-                <div
-                  key={h.dayOfWeek}
-                  className={`flex items-center justify-between px-4 py-3 ${
-                    i < businessHours.length - 1 ? "border-b border-border" : ""
-                  }`}
-                >
-                  <span className="text-sm font-medium w-28">{dayNames[h.dayOfWeek]}</span>
-                  {h.closed ? (
-                    <span className="text-sm text-muted-foreground">Gesloten</span>
-                  ) : (
-                    <span className="text-sm font-mono">
-                      {h.openTime} — {h.closeTime}
-                    </span>
-                  )}
-                </div>
-              ))}
+              {editingHours ? (
+                <>
+                  {hoursForm.map((h, i) => (
+                    <div
+                      key={h.dayOfWeek}
+                      className={`flex items-center gap-3 px-4 py-3 ${
+                        i < hoursForm.length - 1 ? "border-b border-border" : ""
+                      }`}
+                    >
+                      <span className="text-sm font-medium w-24 shrink-0">{dayNames[h.dayOfWeek]}</span>
+                      <button
+                        onClick={() => {
+                          const updated = [...hoursForm];
+                          updated[i] = { ...updated[i], closed: !updated[i].closed };
+                          setHoursForm(updated);
+                        }}
+                        className={`relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors ${
+                          !h.closed ? "bg-gold" : "bg-muted"
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                            !h.closed ? "translate-x-4" : "translate-x-0.5"
+                          } mt-0.5`}
+                        />
+                      </button>
+                      {h.closed ? (
+                        <span className="text-sm text-muted-foreground">Gesloten</span>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="time"
+                            value={h.openTime}
+                            onChange={(e) => {
+                              const updated = [...hoursForm];
+                              updated[i] = { ...updated[i], openTime: e.target.value };
+                              setHoursForm(updated);
+                            }}
+                            className="rounded-lg border border-border bg-background px-2 py-1 text-sm font-mono focus:outline-none focus:border-gold/50"
+                          />
+                          <span className="text-muted-foreground">—</span>
+                          <input
+                            type="time"
+                            value={h.closeTime}
+                            onChange={(e) => {
+                              const updated = [...hoursForm];
+                              updated[i] = { ...updated[i], closeTime: e.target.value };
+                              setHoursForm(updated);
+                            }}
+                            className="rounded-lg border border-border bg-background px-2 py-1 text-sm font-mono focus:outline-none focus:border-gold/50"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  <div className="flex gap-2 px-4 py-3 border-t border-border">
+                    <Button
+                      size="sm"
+                      disabled={actionLoading}
+                      onClick={async () => {
+                        setActionLoading(true);
+                        setError(null);
+                        const result = await barberUpdateBusinessHours(hoursForm);
+                        if (!result.success) {
+                          setError(result.error || "Er ging iets mis.");
+                        } else {
+                          setEditingHours(false);
+                          loadData();
+                        }
+                        setActionLoading(false);
+                      }}
+                      className="h-7 bg-gold/10 text-gold hover:bg-gold/20 text-xs px-3"
+                    >
+                      <Check className="h-3 w-3 mr-1" /> Opslaan
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => { setEditingHours(false); setError(null); }}
+                      className="h-7 text-xs px-3 border-border"
+                    >
+                      <X className="h-3 w-3 mr-1" /> Annuleren
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                businessHours.map((h, i) => (
+                  <div
+                    key={h.dayOfWeek}
+                    className={`flex items-center justify-between px-4 py-3 ${
+                      i < businessHours.length - 1 ? "border-b border-border" : ""
+                    }`}
+                  >
+                    <span className="text-sm font-medium w-28">{dayNames[h.dayOfWeek]}</span>
+                    {h.closed ? (
+                      <span className="text-sm text-muted-foreground">Gesloten</span>
+                    ) : (
+                      <span className="text-sm font-mono">
+                        {h.openTime} — {h.closeTime}
+                      </span>
+                    )}
+                  </div>
+                ))
+              )}
             </CardContent>
           </Card>
         </div>
