@@ -12,7 +12,6 @@ export default async function DigiboxPage() {
 
   const shop = await getShopByUserId(session.userId);
   if (!shop) redirect("/dashboard");
-  if (!shop.digibox) redirect("/dashboard");
 
   const today = new Date().toISOString().split("T")[0];
   const appointments = await getAppointmentsForShop(shop.id, today);
