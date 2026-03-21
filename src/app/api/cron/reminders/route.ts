@@ -14,23 +14,16 @@ export async function GET(req: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
   );
 
-  // Find appointments in 23-24 hours from now
+  // Daily cron (Hobby plan): find all appointments for tomorrow
   const now = new Date();
-  const in23h = new Date(now.getTime() + 23 * 60 * 60 * 1000);
-  const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-
-  const dateStr23 = in23h.toISOString().split("T")[0];
-  const dateStr24 = in24h.toISOString().split("T")[0];
-
-  // Get appointments for tomorrow (or today if it's late)
-  const dates = [dateStr23];
-  if (dateStr24 !== dateStr23) dates.push(dateStr24);
+  const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const tomorrowStr = tomorrow.toISOString().split("T")[0];
 
   const { data: appointments } = await supabase
     .from("Appointment")
     .select("id, date, startTime, customerName, customerEmail, shopId, barberId, serviceId")
     .eq("status", "CONFIRMED")
-    .in("date", dates);
+    .eq("date", tomorrowStr);
 
   if (!appointments || appointments.length === 0) {
     return NextResponse.json({ sent: 0 });
@@ -39,11 +32,6 @@ export async function GET(req: NextRequest) {
   let sent = 0;
 
   for (const apt of appointments) {
-    // Check if appointment is within 23-24 hour window
-    const aptTime = new Date(`${apt.date}T${apt.startTime}:00`);
-    const hoursUntil = (aptTime.getTime() - now.getTime()) / (1000 * 60 * 60);
-
-    if (hoursUntil < 23 || hoursUntil > 24) continue;
 
     // Get shop, barber, service names
     const [{ data: shop }, { data: barber }, { data: service }] = await Promise.all([
