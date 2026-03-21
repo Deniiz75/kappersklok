@@ -45,9 +45,17 @@ const monthNames = [
   "januari", "februari", "maart", "april", "mei", "juni",
   "juli", "augustus", "september", "oktober", "november", "december",
 ];
+const shortMonthNames = [
+  "jan", "feb", "mrt", "apr", "mei", "jun",
+  "jul", "aug", "sep", "okt", "nov", "dec",
+];
 
 function formatDateLong(d: Date) {
   return `${dayNames[d.getDay()]} ${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function formatDateShort(d: Date) {
+  return `${dayNames[d.getDay()].slice(0, 2)} ${d.getDate()} ${shortMonthNames[d.getMonth()]}`;
 }
 
 function timeToMinutes(time: string): number {
@@ -155,7 +163,7 @@ export function DigiboxDisplay({
     };
   }, [shopId, fetchAppointments]);
 
-  // ── Fullscreen toggle ──
+  // ── Fullscreen toggle (desktop only) ──
   const toggleFullscreen = useCallback(async () => {
     if (!document.fullscreenElement) {
       await containerRef.current?.requestFullscreen();
@@ -197,30 +205,41 @@ export function DigiboxDisplay({
     };
   });
 
+  // Total active count for mobile summary
+  const totalActive = appointmentsByBarber.reduce(
+    (sum, { appointments: apts }) =>
+      sum + apts.filter((a) => a.displayStatus !== "DONE").length,
+    0
+  );
+
   return (
     <div
       ref={containerRef}
       className="flex min-h-screen flex-col bg-background text-foreground"
     >
-      {/* ── Header ── */}
-      <header className="flex items-center justify-between border-b border-border/50 bg-gradient-to-r from-gold/5 to-transparent px-6 py-4 lg:px-10 lg:py-5">
-        <div className="flex items-center gap-4">
-          <ShopMonogram name={shopName} size={56} className="lg:hidden" />
-          <ShopMonogram name={shopName} size={72} className="hidden lg:block" />
-          <div>
-            <h1 className="font-heading text-xl font-bold lg:text-3xl">
+      {/* ── Header: compact on mobile, full on desktop ── */}
+      <header className="flex items-center justify-between border-b border-border/50 bg-gradient-to-r from-gold/5 to-transparent px-3 py-2.5 sm:px-6 sm:py-4 lg:px-10 lg:py-5">
+        <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
+          <ShopMonogram name={shopName} size={36} className="sm:hidden shrink-0" />
+          <ShopMonogram name={shopName} size={56} className="hidden sm:block lg:hidden shrink-0" />
+          <ShopMonogram name={shopName} size={72} className="hidden lg:block shrink-0" />
+          <div className="min-w-0">
+            <h1 className="font-heading text-base font-bold truncate sm:text-xl lg:text-3xl">
               {shopName}
             </h1>
-            <p className="text-sm text-muted-foreground lg:text-base">
+            <p className="text-xs text-muted-foreground sm:text-sm lg:text-base hidden sm:block">
               {formatDateLong(now)}
+            </p>
+            <p className="text-[10px] text-muted-foreground sm:hidden">
+              {formatDateShort(now)} — {totalActive} afspra{totalActive === 1 ? "ak" : "ken"}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-4 lg:gap-6">
-          {/* Clock */}
+        <div className="flex items-center gap-2 sm:gap-4 lg:gap-6 shrink-0">
+          {/* Clock: compact on mobile */}
           <div className="text-right">
-            <div className="font-mono text-3xl font-bold tracking-wider lg:text-5xl">
+            <div className="font-mono text-xl font-bold tracking-wider sm:text-3xl lg:text-5xl">
               <span className="text-gold">{hours}</span>
               <motion.span
                 animate={{ opacity: [1, 0.3, 1] }}
@@ -230,24 +249,25 @@ export function DigiboxDisplay({
                 :
               </motion.span>
               <span className="text-gold">{minutes}</span>
-              <span className="ml-1 text-lg text-muted-foreground lg:text-2xl">
+              <span className="hidden sm:inline ml-1 text-lg text-muted-foreground lg:text-2xl">
                 {seconds}
               </span>
             </div>
           </div>
 
           {/* Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <Link
               href="/dashboard"
-              className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+              className="rounded-lg p-1.5 sm:p-2 text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
               title="Terug naar dashboard"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </Link>
+            {/* Fullscreen: hidden on mobile (not supported on iOS) */}
             <button
               onClick={toggleFullscreen}
-              className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+              className="hidden sm:block rounded-lg p-2 text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
               title={
                 isFullscreen ? "Volledig scherm sluiten" : "Volledig scherm"
               }
@@ -263,16 +283,16 @@ export function DigiboxDisplay({
       </header>
 
       {/* ── Barber Columns ── */}
-      <main className="flex-1 overflow-auto p-4 lg:p-6">
+      <main className="flex-1 overflow-auto p-2.5 sm:p-4 lg:p-6">
         {barbers.length === 0 ? (
           <div className="flex h-full items-center justify-center">
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base text-muted-foreground sm:text-lg">
               Geen actieve kappers gevonden.
             </p>
           </div>
         ) : (
           <div
-            className={`grid gap-4 lg:gap-6 ${
+            className={`grid gap-2.5 sm:gap-4 lg:gap-6 ${
               barbers.length === 1
                 ? "grid-cols-1 max-w-2xl mx-auto"
                 : barbers.length === 2
@@ -293,14 +313,14 @@ export function DigiboxDisplay({
         )}
       </main>
 
-      {/* ── Footer ── */}
-      <footer className="flex items-center justify-between border-t border-border/30 px-6 py-3 lg:px-10">
+      {/* ── Footer: hidden on mobile ── */}
+      <footer className="hidden sm:flex items-center justify-between border-t border-border/30 px-6 py-3 lg:px-10">
         <div className="flex items-center gap-2">
           <Logo size={20} />
           <Wordmark size="sm" />
         </div>
         <p className="text-xs text-muted-foreground/50">
-          Digi-box TV Display
+          Digi-box Display
         </p>
       </footer>
     </div>
@@ -320,24 +340,25 @@ function BarberColumn({
   const done = appointments.filter((a) => a.displayStatus === "DONE");
 
   return (
-    <div className="flex flex-col rounded-2xl border border-border/50 bg-surface/50 overflow-hidden">
+    <div className="flex flex-col rounded-xl sm:rounded-2xl border border-border/50 bg-surface/50 overflow-hidden">
       {/* Barber header */}
-      <div className="flex items-center gap-3 border-b border-border/30 bg-surface px-5 py-4">
-        <ShopMonogram name={barber.name} size={40} />
+      <div className="flex items-center gap-2.5 sm:gap-3 border-b border-border/30 bg-surface px-3 py-2.5 sm:px-5 sm:py-4">
+        <ShopMonogram name={barber.name} size={32} className="sm:hidden" />
+        <ShopMonogram name={barber.name} size={40} className="hidden sm:block" />
         <div>
-          <h2 className="font-heading text-base font-bold lg:text-lg">
+          <h2 className="font-heading text-sm font-bold sm:text-base lg:text-lg">
             {barber.name}
           </h2>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-[10px] sm:text-xs text-muted-foreground">
             {active.length} afspra{active.length === 1 ? "ak" : "ken"} vandaag
           </p>
         </div>
       </div>
 
       {/* Appointment list */}
-      <div className="flex-1 space-y-2 p-3 lg:p-4">
+      <div className="flex-1 space-y-1.5 sm:space-y-2 p-2 sm:p-3 lg:p-4">
         {active.length === 0 && done.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground/60">
+          <p className="py-6 sm:py-8 text-center text-xs sm:text-sm text-muted-foreground/60">
             Geen afspraken vandaag
           </p>
         ) : (
@@ -350,17 +371,17 @@ function BarberColumn({
 
             {/* Done appointments (collapsed) */}
             {done.length > 0 && (
-              <div className="mt-3 border-t border-border/20 pt-3">
-                <p className="mb-2 text-xs font-medium text-muted-foreground/40 uppercase tracking-wider">
+              <div className="mt-2 sm:mt-3 border-t border-border/20 pt-2 sm:pt-3">
+                <p className="mb-1.5 sm:mb-2 text-[10px] sm:text-xs font-medium text-muted-foreground/40 uppercase tracking-wider">
                   Afgerond ({done.length})
                 </p>
                 {done.slice(-3).map((apt) => (
                   <div
                     key={apt.id}
-                    className="flex items-center justify-between py-1.5 text-xs text-muted-foreground/30"
+                    className="flex items-center justify-between py-1 sm:py-1.5 text-[10px] sm:text-xs text-muted-foreground/30"
                   >
-                    <span>{apt.customerName}</span>
-                    <span className="font-mono">{apt.startTime}</span>
+                    <span className="truncate mr-2">{apt.customerName}</span>
+                    <span className="font-mono shrink-0">{apt.startTime}</span>
                   </div>
                 ))}
               </div>
@@ -389,7 +410,7 @@ function AppointmentCard({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -40 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className={`relative rounded-xl border p-4 transition-all ${
+      className={`relative rounded-lg sm:rounded-xl border p-2.5 sm:p-4 transition-all ${
         isNow
           ? "border-gold bg-gold/10 shadow-[0_0_20px_-4px_rgba(212,168,83,0.3)]"
           : isNext
@@ -402,14 +423,14 @@ function AppointmentCard({
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className="absolute -right-1 -top-1 flex items-center gap-1 rounded-full bg-gold px-2.5 py-0.5"
+          className="absolute right-1.5 top-1.5 sm:-right-1 sm:-top-1 flex items-center gap-1 rounded-full bg-gold px-2 py-0.5 sm:px-2.5"
         >
           <motion.div
             animate={{ opacity: [1, 0.4, 1] }}
             transition={{ duration: 1.5, repeat: Infinity }}
             className="h-1.5 w-1.5 rounded-full bg-background"
           />
-          <span className="text-[10px] font-bold uppercase text-background">
+          <span className="text-[9px] sm:text-[10px] font-bold uppercase text-background">
             NU
           </span>
         </motion.div>
@@ -417,24 +438,24 @@ function AppointmentCard({
 
       {/* NEXT badge */}
       {isNext && (
-        <div className="absolute -right-1 -top-1 rounded-full border border-gold/40 bg-surface px-2.5 py-0.5">
-          <span className="text-[10px] font-bold uppercase text-gold/70">
+        <div className="absolute right-1.5 top-1.5 sm:-right-1 sm:-top-1 rounded-full border border-gold/40 bg-surface px-2 py-0.5 sm:px-2.5">
+          <span className="text-[9px] sm:text-[10px] font-bold uppercase text-gold/70">
             Volgende
           </span>
         </div>
       )}
 
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-2 sm:gap-3">
         <div className="min-w-0 flex-1">
           <p
             className={`truncate font-semibold ${
-              isNow ? "text-lg lg:text-xl" : "text-base"
+              isNow ? "text-base sm:text-lg lg:text-xl" : "text-sm sm:text-base"
             }`}
           >
             {apt.customerName}
           </p>
           {apt.service?.name && (
-            <p className="truncate text-sm text-muted-foreground">
+            <p className="truncate text-xs sm:text-sm text-muted-foreground">
               {apt.service.name}
             </p>
           )}
@@ -442,12 +463,12 @@ function AppointmentCard({
         <div className="shrink-0 text-right">
           <p
             className={`font-mono font-bold ${
-              isNow ? "text-lg text-gold" : "text-sm"
+              isNow ? "text-base sm:text-lg text-gold" : "text-xs sm:text-sm"
             }`}
           >
             {apt.startTime}
           </p>
-          <p className="font-mono text-xs text-muted-foreground">
+          <p className="font-mono text-[10px] sm:text-xs text-muted-foreground">
             {apt.endTime}
           </p>
         </div>
