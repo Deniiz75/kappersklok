@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import { toggleFavorite, isFavorite } from "@/lib/customer-actions";
 
@@ -38,18 +39,24 @@ export function FavoriteButton({ shopId }: FavoriteButtonProps) {
   }
 
   return (
-    <button
+    <motion.button
       onClick={handleToggle}
       disabled={loading}
-      className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs transition-colors hover:border-gold/40"
+      whileTap={{ scale: 0.9 }}
+      className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs transition-all duration-200 hover:border-gold/40"
       title={favorited ? "Verwijder uit favorieten" : "Toevoegen aan favorieten"}
     >
-      <Heart
-        className={`h-3.5 w-3.5 transition-colors ${
-          favorited ? "fill-gold text-gold" : "text-muted-foreground"
-        }`}
-      />
+      <motion.div
+        animate={favorited ? { scale: [1, 1.3, 1] } : { scale: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Heart
+          className={`h-3.5 w-3.5 transition-all duration-300 ${
+            favorited ? "fill-gold text-gold" : "text-muted-foreground"
+          }`}
+        />
+      </motion.div>
       {favorited ? "Favoriet" : "Favoriet"}
-    </button>
+    </motion.button>
   );
 }

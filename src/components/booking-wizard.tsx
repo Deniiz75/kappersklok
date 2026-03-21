@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createAppointment } from "@/lib/booking-actions";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ShopMonogram } from "@/components/shop-monogram";
@@ -64,6 +65,13 @@ function addMinutes(time: string, mins: number): string {
 export function BookingWizard({ shopId, shopName, services, barbers, businessHours }: BookingWizardProps) {
   const router = useRouter();
   const [step, setStep] = useState(0); // 0=closed, 1=service, 2=barber, 3=datetime, 4=details, 5=done
+  const prevStep = useRef(0);
+  const direction = step > prevStep.current ? 1 : -1;
+
+  function goToStep(s: number) {
+    prevStep.current = step;
+    setStep(s);
+  }
   const [serviceId, setServiceId] = useState("");
   const [barberId, setBarberId] = useState("");
   const [date, setDate] = useState("");
@@ -128,7 +136,7 @@ export function BookingWizard({ shopId, shopName, services, barbers, businessHou
   if (step === 0) {
     return (
       <Button
-        onClick={() => setStep(1)}
+        onClick={() => goToStep(1)}
         className="w-full bg-gold text-background hover:bg-gold-hover font-semibold"
       >
         <CalendarDays className="mr-2 h-4 w-4" />
@@ -170,27 +178,28 @@ export function BookingWizard({ shopId, shopName, services, barbers, businessHou
         {stepLabels.map((label, i) => (
           <div key={label} className="flex items-center gap-1">
             <div
-              className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
-                step > i ? "bg-gold text-background" : step === i + 1 ? "bg-gold/20 text-gold" : "bg-muted text-muted-foreground"
+              className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 ${
+                step > i + 1 ? "bg-gold text-background scale-100" : step === i + 1 ? "bg-gold/20 text-gold scale-110" : "bg-muted text-muted-foreground"
               }`}
             >
               {step > i + 1 ? "✓" : i + 1}
             </div>
             <span className="hidden text-xs text-muted-foreground sm:block">{label}</span>
-            {i < 3 && <div className={`mx-1 h-px w-4 sm:w-8 ${step > i + 1 ? "bg-gold" : "bg-muted"}`} />}
+            {i < 3 && <div className={`mx-1 h-px w-4 sm:w-8 transition-colors duration-500 ${step > i + 1 ? "bg-gold" : "bg-muted"}`} />}
           </div>
         ))}
       </div>
 
+      <AnimatePresence mode="wait" initial={false}>
       {/* Step 1: Service */}
       {step === 1 && (
-        <div>
+        <motion.div key="step1" initial={{ opacity: 0, x: direction * 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: direction * -20 }} transition={{ duration: 0.2 }}>
           <h3 className="font-semibold flex items-center gap-2"><Scissors className="h-4 w-4 text-gold" /> Kies een dienst</h3>
           <div className="mt-3 space-y-2">
             {services.map((svc) => (
               <button
                 key={svc.id}
-                onClick={() => { setServiceId(svc.id); setStep(2); }}
+                onClick={() => { setServiceId(svc.id); goToStep(2); }}
                 className="flex w-full items-center justify-between rounded-lg border border-border bg-background p-3 text-left transition-colors hover:border-gold/40"
               >
                 <div>
@@ -201,18 +210,18 @@ export function BookingWizard({ shopId, shopName, services, barbers, businessHou
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Step 2: Barber */}
       {step === 2 && (
-        <div>
+        <motion.div key="step2" initial={{ opacity: 0, x: direction * 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: direction * -20 }} transition={{ duration: 0.2 }}>
           <h3 className="font-semibold flex items-center gap-2"><User className="h-4 w-4 text-gold" /> Kies een kapper</h3>
           <div className="mt-3 grid gap-2 grid-cols-2">
             {barbers.map((b) => (
               <button
                 key={b.id}
-                onClick={() => { setBarberId(b.id); setStep(3); }}
+                onClick={() => { setBarberId(b.id); goToStep(3); }}
                 className="flex flex-col items-center gap-2 rounded-lg border border-border bg-background p-4 transition-colors hover:border-gold/40"
               >
                 <ShopMonogram name={b.name} size={40} />
@@ -220,13 +229,13 @@ export function BookingWizard({ shopId, shopName, services, barbers, businessHou
               </button>
             ))}
           </div>
-          <button onClick={() => setStep(1)} className="mt-3 text-xs text-muted-foreground hover:text-gold">← Terug</button>
-        </div>
+          <button onClick={() => goToStep(1)} className="mt-3 text-xs text-muted-foreground hover:text-gold transition-colors">← Terug</button>
+        </motion.div>
       )}
 
       {/* Step 3: Date & Time */}
       {step === 3 && (
-        <div>
+        <motion.div key="step3" initial={{ opacity: 0, x: direction * 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: direction * -20 }} transition={{ duration: 0.2 }}>
           <h3 className="font-semibold flex items-center gap-2"><CalendarDays className="h-4 w-4 text-gold" /> Kies datum & tijd</h3>
 
           <div className="mt-3">
@@ -253,7 +262,7 @@ export function BookingWizard({ shopId, shopName, services, barbers, businessHou
                 {timeSlots.map((t) => (
                   <button
                     key={t}
-                    onClick={() => { setTime(t); setStep(4); }}
+                    onClick={() => { setTime(t); goToStep(4); }}
                     className={`rounded border px-2 py-1 text-xs font-mono transition-colors ${
                       time === t ? "border-gold bg-gold/10 text-gold" : "border-border bg-background hover:border-gold/30"
                     }`}
@@ -264,13 +273,13 @@ export function BookingWizard({ shopId, shopName, services, barbers, businessHou
               </div>
             </div>
           )}
-          <button onClick={() => setStep(2)} className="mt-3 text-xs text-muted-foreground hover:text-gold">← Terug</button>
-        </div>
+          <button onClick={() => goToStep(2)} className="mt-3 text-xs text-muted-foreground hover:text-gold transition-colors">← Terug</button>
+        </motion.div>
       )}
 
       {/* Step 4: Customer details */}
       {step === 4 && (
-        <div>
+        <motion.div key="step4" initial={{ opacity: 0, x: direction * 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: direction * -20 }} transition={{ duration: 0.2 }}>
           <h3 className="font-semibold flex items-center gap-2"><Clock className="h-4 w-4 text-gold" /> Uw gegevens</h3>
           <div className="mt-2 rounded-lg bg-gold/5 border border-gold/20 p-3 text-xs">
             <p><span className="text-muted-foreground">Dienst:</span> {selectedService?.name} ({selectedService?.duration} min)</p>
@@ -301,7 +310,7 @@ export function BookingWizard({ shopId, shopName, services, barbers, businessHou
               <Input name="notes" placeholder="Optioneel" className="border-border bg-background text-sm" />
             </div>
             <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={() => setStep(3)} className="flex-1 border-border text-sm">
+              <Button type="button" variant="outline" onClick={() => goToStep(3)} className="flex-1 border-border text-sm">
                 Terug
               </Button>
               <Button type="submit" disabled={status === "loading"} className="flex-1 bg-gold text-background hover:bg-gold-hover font-semibold text-sm">
@@ -309,8 +318,9 @@ export function BookingWizard({ shopId, shopName, services, barbers, businessHou
               </Button>
             </div>
           </form>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </div>
   );
 }

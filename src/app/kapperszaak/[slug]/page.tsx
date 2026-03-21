@@ -7,6 +7,7 @@ import { ShopMonogram } from "@/components/shop-monogram";
 import { BookingWizard } from "@/components/booking-wizard";
 import { ReviewSection } from "@/components/review-section";
 import { FavoriteButton } from "@/components/favorite-button";
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/motion";
 import { MapPin, Phone, Instagram, Clock, Star } from "lucide-react";
 
 interface Props {
@@ -57,6 +58,7 @@ export default async function KapperszaakPage({ params }: Props) {
           <div className="grid gap-6 lg:grid-cols-5">
             {/* Left column — info */}
             <div className="lg:col-span-2 space-y-6">
+              <FadeIn delay={0.1}>
               <div className="rounded-lg border border-border bg-surface p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -92,9 +94,11 @@ export default async function KapperszaakPage({ params }: Props) {
                   )}
                 </div>
               </div>
+              </FadeIn>
 
               {/* Business hours */}
               {shop.businessHours.length > 0 && (
+                <FadeIn delay={0.2}>
                 <div className="rounded-lg border border-border bg-surface p-5">
                   <h3 className="text-sm font-semibold uppercase tracking-wide text-gold">Openingstijden</h3>
                   <div className="mt-3 space-y-1.5">
@@ -108,10 +112,12 @@ export default async function KapperszaakPage({ params }: Props) {
                     ))}
                   </div>
                 </div>
+                </FadeIn>
               )}
 
               {/* Services */}
               {shop.services.length > 0 && (
+                <FadeIn delay={0.3}>
                 <div className="rounded-lg border border-border bg-surface p-5">
                   <h3 className="text-sm font-semibold uppercase tracking-wide text-gold">Diensten</h3>
                   <div className="mt-3 space-y-2">
@@ -128,11 +134,12 @@ export default async function KapperszaakPage({ params }: Props) {
                     ))}
                   </div>
                 </div>
+                </FadeIn>
               )}
             </div>
 
             {/* Right column — booking */}
-            <div className="lg:col-span-3">
+            <FadeIn delay={0.15} direction="right" className="lg:col-span-3">
               <BookingWizard
                 shopId={shop.id}
                 shopName={shop.name}
@@ -169,7 +176,7 @@ export default async function KapperszaakPage({ params }: Props) {
                   avgRating={shop.avgRating}
                 />
               </div>
-            </div>
+            </FadeIn>
           </div>
         </div>
       </section>
