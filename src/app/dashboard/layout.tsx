@@ -17,6 +17,8 @@ import {
   ShieldCheck,
   CreditCard,
   Star,
+  BarChart3,
+  UserSearch,
 } from "lucide-react";
 
 const barberNav = [
@@ -29,11 +31,13 @@ const barberNav = [
 const adminNav = [
   { href: "/dashboard", label: "Overzicht", shortLabel: "Home", icon: LayoutDashboard, iconName: "LayoutDashboard" },
   { href: "/dashboard/shops", label: "Kapperszaken", shortLabel: "Shops", icon: Store, iconName: "Store" },
+  { href: "/dashboard/klanten", label: "Klanten", shortLabel: "Klanten", icon: UserSearch, iconName: "UserSearch" },
+  { href: "/dashboard/alle-afspraken", label: "Afspraken", shortLabel: "Afspraken", icon: CalendarDays, iconName: "CalendarDays" },
   { href: "/dashboard/betalingen", label: "Betalingen", shortLabel: "Betaling", icon: CreditCard, iconName: "CreditCard" },
-  { href: "/dashboard/alle-afspraken", label: "Alle afspraken", shortLabel: "Afspraken", icon: CalendarDays, iconName: "CalendarDays" },
-  { href: "/dashboard/reviews", label: "Reviews beheer", shortLabel: "Reviews", icon: Star, iconName: "Star" },
+  { href: "/dashboard/reviews", label: "Reviews", shortLabel: "Reviews", icon: Star, iconName: "Star" },
   { href: "/dashboard/berichten", label: "Berichten", shortLabel: "Berichten", icon: MessageSquare, iconName: "MessageSquare" },
   { href: "/dashboard/gebruikers", label: "Gebruikers", shortLabel: "Users", icon: Users, iconName: "Users" },
+  { href: "/dashboard/analytics", label: "Analytics", shortLabel: "Analytics", icon: BarChart3, iconName: "BarChart3" },
 ];
 
 export default async function DashboardLayout({

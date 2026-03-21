@@ -16,6 +16,8 @@ import {
   LogOut,
   Heart,
   User,
+  BarChart3,
+  UserSearch,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -31,6 +33,8 @@ const iconMap: Record<string, LucideIcon> = {
   Settings,
   Heart,
   User,
+  BarChart3,
+  UserSearch,
 };
 
 interface NavItem {

@@ -5,7 +5,8 @@ import { supabase } from "@/lib/db";
 import { updateShopStatus } from "@/lib/admin-actions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Check, X, Eye } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { MapPin, Check, X, Eye, Search } from "lucide-react";
 import Link from "next/link";
 
 interface Shop {
@@ -22,6 +23,7 @@ interface Shop {
 export default function ShopsPage() {
   const [shops, setShops] = useState<Shop[]>([]);
   const [filter, setFilter] = useState<"ALL" | "ACTIVE" | "PENDING" | "SUSPENDED">("ALL");
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
   async function loadShops() {
@@ -58,6 +60,16 @@ export default function ShopsPage() {
       <h1 className="font-heading text-2xl font-bold">Kapperszaken</h1>
       <p className="mt-1 text-muted-foreground">Beheer alle geregistreerde kapperszaken</p>
 
+      <div className="mt-4 relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Zoek op naam, stad, email..."
+          className="pl-9 border-border bg-surface"
+        />
+      </div>
+
       <div className="mt-4 flex gap-2">
         {filters.map((f) => (
           <button
@@ -84,12 +96,16 @@ export default function ShopsPage() {
         </Card>
       ) : (
         <div className="mt-6 space-y-3">
-          {shops.map((shop) => (
+          {shops.filter((s) => {
+            if (!search) return true;
+            const q = search.toLowerCase();
+            return s.name.toLowerCase().includes(q) || (s.city || "").toLowerCase().includes(q) || s.email.toLowerCase().includes(q);
+          }).map((shop) => (
             <Card key={shop.id} className="border-border bg-surface">
               <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium truncate">{shop.name}</p>
+                    <Link href={`/dashboard/shops/${shop.id}`} className="font-medium truncate hover:text-gold transition-colors">{shop.name}</Link>
                     <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs ${
                       shop.status === "ACTIVE" ? "bg-gold/10 text-gold"
                         : shop.status === "PENDING" ? "bg-yellow-500/10 text-yellow-500"
