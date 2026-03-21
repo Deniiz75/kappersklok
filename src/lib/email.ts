@@ -49,6 +49,62 @@ export function bookingConfirmationEmail(data: {
   };
 }
 
+export function cancellationConfirmationEmail(data: {
+  customerName: string;
+  shopName: string;
+  serviceName: string;
+  date: string;
+  time: string;
+}) {
+  return {
+    subject: `Annulering bevestigd — ${data.shopName}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto;">
+        <h2 style="color: #d4a853;">Afspraak geannuleerd</h2>
+        <p>Beste ${data.customerName},</p>
+        <p>Uw afspraak bij <strong>${data.shopName}</strong> is geannuleerd:</p>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr><td style="padding: 8px 0; color: #666;">Dienst</td><td style="padding: 8px 0;"><strong>${data.serviceName}</strong></td></tr>
+          <tr><td style="padding: 8px 0; color: #666;">Datum</td><td style="padding: 8px 0;"><strong>${data.date}</strong></td></tr>
+          <tr><td style="padding: 8px 0; color: #666;">Tijd</td><td style="padding: 8px 0;"><strong>${data.time}</strong></td></tr>
+        </table>
+        <p style="margin-top: 20px;">U kunt altijd een nieuwe afspraak maken via Kappersklok.</p>
+        <a href="https://kappersklok.vercel.app/kapper-zoeken" style="display: inline-block; background: #d4a853; color: #0a0a0a; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold;">Nieuwe afspraak boeken</a>
+        <p style="margin-top: 30px; color: #666; font-size: 12px;">Met vriendelijke groet,<br>Kappersklok</p>
+      </div>
+    `,
+  };
+}
+
+export function reminderEmail(data: {
+  customerName: string;
+  shopName: string;
+  serviceName: string;
+  date: string;
+  time: string;
+  barberName: string;
+}) {
+  return {
+    subject: `Herinnering: Morgen afspraak bij ${data.shopName}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto;">
+        <h2 style="color: #d4a853;">Herinnering: Afspraak morgen</h2>
+        <p>Beste ${data.customerName},</p>
+        <p>Dit is een herinnering voor uw afspraak bij <strong>${data.shopName}</strong>:</p>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr><td style="padding: 8px 0; color: #666;">Dienst</td><td style="padding: 8px 0;"><strong>${data.serviceName}</strong></td></tr>
+          <tr><td style="padding: 8px 0; color: #666;">Kapper</td><td style="padding: 8px 0;"><strong>${data.barberName}</strong></td></tr>
+          <tr><td style="padding: 8px 0; color: #666;">Datum</td><td style="padding: 8px 0;"><strong>${data.date}</strong></td></tr>
+          <tr><td style="padding: 8px 0; color: #666;">Tijd</td><td style="padding: 8px 0;"><strong>${data.time}</strong></td></tr>
+        </table>
+        <p style="margin-top: 20px;">Wij kijken ernaar uit u te zien!</p>
+        <a href="https://kappersklok.vercel.app/mijn-afspraken" style="display: inline-block; background: #d4a853; color: #0a0a0a; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold;">Bekijk afspraak</a>
+        <p style="margin-top: 30px; color: #666; font-size: 12px;">Met vriendelijke groet,<br>Kappersklok</p>
+      </div>
+    `,
+  };
+}
+
 export function barberNotificationEmail(data: {
   customerName: string;
   serviceName: string;

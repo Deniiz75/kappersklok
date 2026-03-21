@@ -5,7 +5,7 @@ import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import { Card, CardContent } from "@/components/ui/card";
 import { ButtonLink } from "@/components/button-link";
-import { Logo } from "@/components/logo";
+import { getFavorites } from "@/lib/customer-actions";
 import {
   CalendarDays,
   Clock,
@@ -13,10 +13,11 @@ import {
   Scissors,
   Star,
   User,
+  Heart,
   ArrowRight,
-  LogOut,
   CheckCircle,
   XCircle,
+  RefreshCw,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -81,28 +82,40 @@ export default async function MijnAfsprakenPage() {
   const upcoming = all.filter((a) => a.date >= today && a.status === "CONFIRMED");
   const past = all.filter((a) => a.date < today || a.status !== "CONFIRMED");
 
-  const totalSpent = all
-    .filter((a) => a.status !== "CANCELLED")
-    .reduce((sum, a) => sum + (a.service?.price || 0), 0);
+  const completed = all.filter((a) => a.status !== "CANCELLED");
+  const totalSpent = completed.reduce((sum, a) => sum + (a.service?.price || 0), 0);
+
+  // Extended stats
+  const barberCounts: Record<string, { name: string; count: number }> = {};
+  const serviceCounts: Record<string, { name: string; count: number }> = {};
+  for (const a of completed) {
+    if (a.barber?.name) {
+      const key = a.barber.name;
+      barberCounts[key] = barberCounts[key] || { name: key, count: 0 };
+      barberCounts[key].count++;
+    }
+    if (a.service?.name) {
+      const key = a.service.name;
+      serviceCounts[key] = serviceCounts[key] || { name: key, count: 0 };
+      serviceCounts[key].count++;
+    }
+  }
+  const topBarber = Object.values(barberCounts).sort((a, b) => b.count - a.count)[0];
+  const topService = Object.values(serviceCounts).sort((a, b) => b.count - a.count)[0];
+  const avgSpent = completed.length > 0 ? Math.round(totalSpent / completed.length) : 0;
+
+  // Fetch favorites
+  const favorites = await getFavorites(email);
+
+  // Check which past appointments already have reviews
+  const pastIds = past.filter((a) => a.status !== "CANCELLED" && a.date < today).map((a) => a.id);
+  const { data: existingReviews } = pastIds.length > 0
+    ? await supabase.from("Review").select("appointmentId").in("appointmentId", pastIds)
+    : { data: [] };
+  const reviewedIds = new Set((existingReviews || []).map((r: { appointmentId: string }) => r.appointmentId));
 
   return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <div className="border-b border-border bg-surface/50">
-        <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-2">
-            <Logo size={28} />
-            <span className="text-sm font-semibold">Kappersklok</span>
-          </Link>
-          <form action="/api/klant-logout" method="POST">
-            <button type="submit" className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
-              <LogOut className="h-3.5 w-3.5" />
-              Uitloggen
-            </button>
-          </form>
-        </div>
-      </div>
-
+    <div>
       <div className="mx-auto max-w-3xl px-4 py-8">
         {/* Welcome */}
         <div className="flex items-center gap-3 mb-8">
@@ -125,8 +138,8 @@ export default async function MijnAfsprakenPage() {
           </Card>
           <Card className="border-border bg-surface">
             <CardContent className="p-3 text-center">
-              <p className="text-2xl font-bold">{all.length}</p>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Totaal</p>
+              <p className="text-2xl font-bold">{completed.length}</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Bezoeken</p>
             </CardContent>
           </Card>
           <Card className="border-border bg-surface">
@@ -136,6 +149,66 @@ export default async function MijnAfsprakenPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Extended stats */}
+        {completed.length > 2 && (
+          <div className="mb-8 grid grid-cols-3 gap-3">
+            {topBarber && (
+              <Card className="border-border bg-surface">
+                <CardContent className="p-3 text-center">
+                  <Scissors className="mx-auto h-4 w-4 text-gold/60 mb-1" />
+                  <p className="text-xs font-semibold truncate">{topBarber.name}</p>
+                  <p className="text-[10px] text-muted-foreground">{topBarber.count}x bezocht</p>
+                </CardContent>
+              </Card>
+            )}
+            {topService && (
+              <Card className="border-border bg-surface">
+                <CardContent className="p-3 text-center">
+                  <Star className="mx-auto h-4 w-4 text-gold/60 mb-1" />
+                  <p className="text-xs font-semibold truncate">{topService.name}</p>
+                  <p className="text-[10px] text-muted-foreground">{topService.count}x geboekt</p>
+                </CardContent>
+              </Card>
+            )}
+            <Card className="border-border bg-surface">
+              <CardContent className="p-3 text-center">
+                <Clock className="mx-auto h-4 w-4 text-gold/60 mb-1" />
+                <p className="text-xs font-semibold">{formatPrice(avgSpent)}</p>
+                <p className="text-[10px] text-muted-foreground">Gem. per bezoek</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Favorites */}
+        {favorites.length > 0 && (
+          <div className="mb-8">
+            <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-gold mb-4">
+              <Heart className="h-4 w-4" />
+              Mijn favorieten ({favorites.length})
+            </h2>
+            <div className="flex gap-3 overflow-x-auto pb-2">
+              {favorites.map((fav) => {
+                const shop = fav.shop as unknown as { name: string; slug: string; city: string | null } | null;
+                return (
+                  <div key={fav.id} className="flex shrink-0 items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3">
+                    <div>
+                      <p className="text-sm font-semibold">{shop?.name}</p>
+                      {shop?.city && <p className="text-[10px] text-muted-foreground">{shop.city}</p>}
+                    </div>
+                    <ButtonLink
+                      href={`/kapperszaak/${shop?.slug}`}
+                      className="bg-gold text-background hover:bg-gold-hover font-semibold text-[10px] px-2.5 py-1 h-auto"
+                    >
+                      Boek
+                    </ButtonLink>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Upcoming */}
         <div className="mb-8">
@@ -159,7 +232,7 @@ export default async function MijnAfsprakenPage() {
               {upcoming.map((apt) => (
                 <Card key={apt.id} className="border-border bg-surface overflow-hidden">
                   <CardContent className="p-0">
-                    <div className="flex">
+                    <Link href={`/mijn-afspraken/${apt.id}`} className="flex hover:bg-surface/80 transition-colors">
                       {/* Date sidebar */}
                       <div className="flex w-20 shrink-0 flex-col items-center justify-center bg-gold/5 border-r border-gold/10 py-4">
                         <span className="text-2xl font-bold text-gold font-mono">{apt.startTime}</span>
@@ -191,18 +264,26 @@ export default async function MijnAfsprakenPage() {
                             <span className="rounded-full bg-gold/10 px-2 py-0.5 text-[10px] font-medium text-gold">
                               Bevestigd
                             </span>
-                            {apt.cancelToken && (
+                            <div className="flex gap-2">
                               <Link
-                                href={`/afspraak/annuleren?token=${apt.cancelToken}`}
-                                className="text-[10px] text-muted-foreground hover:text-destructive transition-colors"
+                                href={`/afspraak/herplannen?id=${apt.id}`}
+                                className="text-[10px] text-muted-foreground hover:text-gold transition-colors"
                               >
-                                Annuleren
+                                Herplannen
                               </Link>
-                            )}
+                              {apt.cancelToken && (
+                                <Link
+                                  href={`/afspraak/annuleren?token=${apt.cancelToken}`}
+                                  className="text-[10px] text-muted-foreground hover:text-destructive transition-colors"
+                                >
+                                  Annuleren
+                                </Link>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   </CardContent>
                 </Card>
               ))}
@@ -219,9 +300,10 @@ export default async function MijnAfsprakenPage() {
             </h2>
             <div className="space-y-2">
               {past.slice(0, 20).map((apt) => (
-                <div
+                <Link
                   key={apt.id}
-                  className="flex items-center justify-between rounded-xl border border-border/50 bg-surface/30 px-4 py-3"
+                  href={`/mijn-afspraken/${apt.id}`}
+                  className="flex items-center justify-between rounded-xl border border-border/50 bg-surface/30 px-4 py-3 hover:bg-surface/50 transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {apt.status === "CANCELLED" ? (
@@ -240,14 +322,26 @@ export default async function MijnAfsprakenPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="shrink-0 text-right">
+                  <div className="shrink-0 flex items-center gap-2">
                     {apt.status === "CANCELLED" ? (
                       <span className="text-xs text-destructive/60">Geannuleerd</span>
                     ) : (
-                      <span className="text-xs text-muted-foreground">{apt.service ? formatPrice(apt.service.price) : ""}</span>
+                      <>
+                        {apt.date < today && !reviewedIds.has(apt.id) && (
+                          <span className="rounded-full bg-gold/10 px-2 py-0.5 text-[10px] text-gold flex items-center gap-1">
+                            <Star className="h-2.5 w-2.5" /> Review
+                          </span>
+                        )}
+                        {apt.date < today && apt.shop && (
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                            <RefreshCw className="h-2.5 w-2.5" /> Opnieuw
+                          </span>
+                        )}
+                        <span className="text-xs text-muted-foreground">{apt.service ? formatPrice(apt.service.price) : ""}</span>
+                      </>
                     )}
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

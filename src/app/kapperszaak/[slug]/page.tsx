@@ -6,6 +6,7 @@ import { LocalBusinessSchema } from "@/components/json-ld";
 import { ShopMonogram } from "@/components/shop-monogram";
 import { BookingWizard } from "@/components/booking-wizard";
 import { ReviewSection } from "@/components/review-section";
+import { FavoriteButton } from "@/components/favorite-button";
 import { MapPin, Phone, Instagram, Clock, Star } from "lucide-react";
 
 interface Props {
@@ -57,12 +58,15 @@ export default async function KapperszaakPage({ params }: Props) {
             {/* Left column — info */}
             <div className="lg:col-span-2 space-y-6">
               <div className="rounded-lg border border-border bg-surface p-6">
-                <div className="flex items-center gap-4">
-                  <ShopMonogram name={shop.name} size={56} />
-                  <div>
-                    <h2 className="font-heading text-lg font-bold">{shop.name}</h2>
-                    <p className="text-sm text-muted-foreground">{shop.contactName}</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <ShopMonogram name={shop.name} size={56} />
+                    <div>
+                      <h2 className="font-heading text-lg font-bold">{shop.name}</h2>
+                      <p className="text-sm text-muted-foreground">{shop.contactName}</p>
+                    </div>
                   </div>
+                  <FavoriteButton shopId={shop.id} />
                 </div>
 
                 <div className="mt-5 space-y-3">

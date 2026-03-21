@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createAppointment } from "@/lib/booking-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,6 +62,7 @@ function addMinutes(time: string, mins: number): string {
 }
 
 export function BookingWizard({ shopId, shopName, services, barbers, businessHours }: BookingWizardProps) {
+  const router = useRouter();
   const [step, setStep] = useState(0); // 0=closed, 1=service, 2=barber, 3=datetime, 4=details, 5=done
   const [serviceId, setServiceId] = useState("");
   const [barberId, setBarberId] = useState("");
@@ -115,8 +117,8 @@ export function BookingWizard({ shopId, shopName, services, barbers, businessHou
     });
 
     if (result.success) {
-      setAppointmentId(result.appointmentId);
-      setStep(5);
+      router.push(`/afspraak/bevestiging/${result.appointmentId}`);
+      return;
     } else {
       setError(result.error);
       setStatus("error");

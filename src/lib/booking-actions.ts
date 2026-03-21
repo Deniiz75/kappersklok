@@ -2,7 +2,7 @@
 
 import { supabase } from "@/lib/db";
 import { z } from "zod";
-import { sendEmail, bookingConfirmationEmail, barberNotificationEmail } from "@/lib/email";
+import { sendEmail, bookingConfirmationEmail, barberNotificationEmail, cancellationConfirmationEmail } from "@/lib/email";
 
 const bookingSchema = z.object({
   shopId: z.string().min(1),
@@ -98,11 +98,101 @@ export async function createAppointment(data: unknown): Promise<BookingResult> {
   }
 }
 
+const rescheduleSchema = z.object({
+  appointmentId: z.string().min(1),
+  date: z.string().min(1),
+  startTime: z.string().min(1),
+  endTime: z.string().min(1),
+});
+
+export async function rescheduleAppointment(data: unknown): Promise<{ success: boolean; error?: string }> {
+  const parsed = rescheduleSchema.safeParse(data);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0].message };
+  }
+
+  const d = parsed.data;
+
+  try {
+    const { data: appointment, error } = await supabase
+      .from("Appointment")
+      .select("id, date, startTime, barberId, shopId, serviceId, customerName, customerEmail, customerPhone")
+      .eq("id", d.appointmentId)
+      .eq("status", "CONFIRMED")
+      .single();
+
+    if (error || !appointment) {
+      return { success: false, error: "Afspraak niet gevonden of al geannuleerd." };
+    }
+
+    const appointmentDateTime = new Date(`${appointment.date}T${appointment.startTime}:00`);
+    const hoursUntil = (appointmentDateTime.getTime() - Date.now()) / (1000 * 60 * 60);
+
+    if (hoursUntil < 2) {
+      return { success: false, error: "Herplannen is niet meer mogelijk binnen 2 uur voor de afspraak." };
+    }
+
+    // Check conflict on new timeslot
+    const { data: existing } = await supabase
+      .from("Appointment")
+      .select("id")
+      .eq("barberId", appointment.barberId)
+      .eq("date", d.date)
+      .eq("startTime", d.startTime)
+      .eq("status", "CONFIRMED")
+      .neq("id", d.appointmentId)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      return { success: false, error: "Dit tijdslot is al bezet. Kies een ander tijdstip." };
+    }
+
+    await supabase
+      .from("Appointment")
+      .update({ date: d.date, startTime: d.startTime, endTime: d.endTime })
+      .eq("id", d.appointmentId);
+
+    // Send reschedule confirmation email
+    const { data: shop } = await supabase.from("Shop").select("name, email").eq("id", appointment.shopId).single();
+    const { data: barber } = await supabase.from("Barber").select("name").eq("id", appointment.barberId).single();
+    const { data: service } = await supabase.from("Service").select("name").eq("id", appointment.serviceId).single();
+
+    if (shop && barber && service) {
+      const confirmEmail = bookingConfirmationEmail({
+        customerName: appointment.customerName,
+        shopName: shop.name,
+        serviceName: service.name,
+        date: d.date,
+        time: d.startTime,
+        barberName: barber.name,
+        cancelToken: d.appointmentId,
+      });
+      confirmEmail.subject = `Herplannen: Afspraak bij ${shop.name} verplaatst`;
+      sendEmail({ to: appointment.customerEmail, ...confirmEmail }).catch(() => {});
+    }
+
+    return { success: true };
+  } catch {
+    return { success: false, error: "Er ging iets mis. Probeer het later opnieuw." };
+  }
+}
+
+export async function getAppointmentForReschedule(appointmentId: string) {
+  const { data, error } = await supabase
+    .from("Appointment")
+    .select("id, date, startTime, endTime, shopId, barberId, serviceId, customerEmail, status, shop:Shop(name, slug), barber:Barber(name), service:Service(name, duration, price)")
+    .eq("id", appointmentId)
+    .single();
+
+  if (error || !data) return null;
+  return data;
+}
+
 export async function cancelAppointment(token: string): Promise<{ success: boolean; error?: string }> {
   try {
     const { data: appointment, error } = await supabase
       .from("Appointment")
-      .select("id, date, startTime")
+      .select("id, date, startTime, customerName, customerEmail, shopId, serviceId")
       .eq("cancelToken", token)
       .eq("status", "CONFIRMED")
       .single();
@@ -119,6 +209,22 @@ export async function cancelAppointment(token: string): Promise<{ success: boole
     }
 
     await supabase.from("Appointment").update({ status: "CANCELLED" }).eq("id", appointment.id);
+
+    // Send cancellation confirmation email
+    const { data: shop } = await supabase.from("Shop").select("name").eq("id", appointment.shopId).single();
+    const { data: service } = await supabase.from("Service").select("name").eq("id", appointment.serviceId).single();
+
+    if (shop && service) {
+      const cancelEmail = cancellationConfirmationEmail({
+        customerName: appointment.customerName,
+        shopName: shop.name,
+        serviceName: service.name,
+        date: appointment.date,
+        time: appointment.startTime,
+      });
+      sendEmail({ to: appointment.customerEmail, ...cancelEmail }).catch(() => {});
+    }
+
     return { success: true };
   } catch {
     return { success: false, error: "Er ging iets mis." };

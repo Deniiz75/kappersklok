@@ -48,6 +48,7 @@ model Shop {
   appointments   Appointment[]
   reviews        Review[]
   payments       Payment[]
+  favorites      Favorite[]
 }
 
 model Barber {
@@ -112,6 +113,7 @@ model Review {
   id            String   @id @default(cuid())
   shopId        String
   shop          Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  appointmentId String?  @unique
   customerName  String
   customerEmail String
   rating        Int      // 1-5
@@ -130,6 +132,27 @@ model Payment {
   period      String        // "2026-03" (maand)
   paidAt      DateTime      @default(now())
   createdAt   DateTime      @default(now())
+}
+
+model Customer {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  name      String?
+  phone     String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  favorites Favorite[]
+}
+
+model Favorite {
+  id            String   @id @default(cuid())
+  customerEmail String
+  shopId        String
+  customer      Customer @relation(fields: [customerEmail], references: [email], onDelete: Cascade)
+  shop          Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+
+  @@unique([customerEmail, shopId])
 }
 
 model ContactMessage {

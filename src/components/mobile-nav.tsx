@@ -14,6 +14,8 @@ import {
   Settings,
   MoreHorizontal,
   LogOut,
+  Heart,
+  User,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -27,6 +29,8 @@ const iconMap: Record<string, LucideIcon> = {
   Users,
   Scissors,
   Settings,
+  Heart,
+  User,
 };
 
 interface NavItem {
@@ -38,9 +42,10 @@ interface NavItem {
 
 interface MobileNavProps {
   items: NavItem[];
+  logoutAction?: string;
 }
 
-export function MobileNav({ items }: MobileNavProps) {
+export function MobileNav({ items, logoutAction = "/api/logout" }: MobileNavProps) {
   const [open, setOpen] = useState(false);
 
   const visible = items.slice(0, 3);
@@ -99,7 +104,7 @@ export function MobileNav({ items }: MobileNavProps) {
                   {item.label}
                 </Link>
               ))}
-              <form action="/api/logout" method="POST">
+              <form action={logoutAction} method="POST">
                 <button
                   type="submit"
                   className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-muted-foreground transition-colors active:bg-destructive/10"
