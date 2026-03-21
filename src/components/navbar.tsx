@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+// Menu/X icons replaced by animated hamburger lines
 import { motion, AnimatePresence } from "framer-motion";
 import { ButtonLink } from "@/components/button-link";
 import { BrandLink } from "@/components/brand-link";
@@ -36,23 +36,28 @@ export function Navbar() {
       <div className="mx-auto flex h-16 max-w-6xl items-center px-4">
         {/* Left: hamburger on mobile, nav links on desktop */}
         <div className="flex flex-1 items-center md:gap-6">
+          {/* Knipklok-style animated hamburger → X */}
           <motion.button
-            className="mr-2 text-foreground md:hidden"
+            className="relative mr-2 h-5 w-6 md:hidden"
             onClick={() => setOpen(!open)}
             aria-label="Menu"
             whileTap={{ scale: 0.9 }}
           >
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={open ? "close" : "open"}
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.15 }}
-              >
-                {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </motion.div>
-            </AnimatePresence>
+            <span
+              className={`absolute left-0 block h-[2px] w-full bg-foreground transition-all duration-400 ease-in-out ${
+                open ? "top-[9px] rotate-45" : "top-0 rotate-0"
+              }`}
+            />
+            <span
+              className={`absolute left-0 top-[9px] block h-[2px] bg-foreground transition-all duration-400 ease-in-out ${
+                open ? "w-0 opacity-0" : "w-5 opacity-100"
+              }`}
+            />
+            <span
+              className={`absolute left-0 block h-[2px] w-full bg-foreground transition-all duration-400 ease-in-out ${
+                open ? "top-[9px] -rotate-45" : "top-[18px] rotate-0"
+              }`}
+            />
           </motion.button>
           <nav className="hidden items-center gap-6 md:flex">
             {navLinks.map((link) => (
