@@ -103,6 +103,11 @@ export default function AanmeldenPage() {
 
     const result = await registerShop(data);
     if (result.success) {
+      if (result.checkoutUrl) {
+        // Redirect naar Mollie checkout
+        window.location.href = result.checkoutUrl;
+        return;
+      }
       setStatus("success");
     } else {
       setError(result.error);

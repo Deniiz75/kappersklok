@@ -5,6 +5,7 @@ import { getShopByUserId } from "@/lib/db";
 import { Logo } from "@/components/logo";
 import { Wordmark } from "@/components/wordmark";
 import { MobileNav } from "@/components/mobile-nav";
+import { PaymentGate } from "@/components/payment-gate";
 import {
   CalendarDays,
   Scissors as ScissorsIcon,
@@ -56,7 +57,7 @@ export default async function DashboardLayout({
   if (!session) redirect("/login");
 
   const isAdmin = session.role === "ADMIN";
-  let shop = null;
+  let shop: { id: string; name: string; city: string | null; status: string } | null = null;
   if (!isAdmin) {
     try {
       shop = await getShopByUserId(session.userId);
@@ -64,6 +65,11 @@ export default async function DashboardLayout({
       /* shop stays null */
     }
     if (!shop) redirect("/");
+  }
+
+  // Payment gate: PENDING shops moeten eerst betalen
+  if (!isAdmin && shop && shop.status === "PENDING") {
+    return <PaymentGate shopId={shop.id} shopName={shop.name} />;
   }
 
   const navItems = isAdmin ? adminNav : barberNav;

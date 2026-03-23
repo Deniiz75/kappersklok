@@ -3,9 +3,12 @@
 import { supabase } from "@/lib/db";
 import { createSession } from "@/lib/auth";
 import { contactFormSchema, registrationSchema, loginSchema } from "@/lib/validations";
+import { createRegistrationPayment } from "@/lib/mollie";
 import bcrypt from "bcryptjs";
 
-type ActionResult = { success: true } | { success: false; error: string };
+type ActionResult =
+  | { success: true; checkoutUrl?: string }
+  | { success: false; error: string };
 
 export async function submitContactForm(data: unknown): Promise<ActionResult> {
   const parsed = contactFormSchema.safeParse(data);
@@ -68,7 +71,7 @@ export async function registerShop(data: unknown): Promise<ActionResult> {
     if (userError || !user) throw userError;
 
     // Create shop
-    const { error: shopError } = await supabase.from("Shop").insert({
+    const { data: shop, error: shopError } = await supabase.from("Shop").insert({
       name: d.shopName,
       slug,
       contactName: d.contactName,
@@ -89,11 +92,19 @@ export async function registerShop(data: unknown): Promise<ActionResult> {
       barbersCount: d.barbersCount,
       welcomePackage: d.welcomePackage,
       userId: user.id,
-    });
-    if (shopError) throw shopError;
+    }).select("id").single();
+    if (shopError || !shop) throw shopError;
 
     await createSession({ userId: user.id, email: user.email, role: user.role });
-    return { success: true };
+
+    // Maak Mollie betaling aan
+    try {
+      const { checkoutUrl } = await createRegistrationPayment(shop.id, d.shopName, d.email);
+      return { success: true, checkoutUrl };
+    } catch {
+      // Shop is aangemaakt maar betaling mislukt — user kan later betalen via dashboard
+      return { success: true };
+    }
   } catch {
     return { success: false, error: "Er ging iets mis bij de registratie." };
   }

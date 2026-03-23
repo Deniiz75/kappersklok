@@ -132,6 +132,9 @@ model Payment {
   period      String        // "2026-03" (maand)
   paidAt      DateTime      @default(now())
   createdAt   DateTime      @default(now())
+  mollieId    String?       // Mollie payment ID (tr_xxxx)
+  checkoutUrl String?       // Mollie checkout URL
+  method      String?       // "ideal", "bancontact", etc.
 }
 
 model Customer {
