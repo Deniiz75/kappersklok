@@ -86,8 +86,14 @@ export function Navbar() {
           </div>
         </motion.div>
 
-        {/* Right: CTA on desktop */}
-        <div className="flex flex-1 items-center justify-end">
+        {/* Right: Login + CTA on desktop */}
+        <div className="flex flex-1 items-center justify-end gap-4">
+          <Link
+            href="/login"
+            className="hidden text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground md:inline-flex"
+          >
+            Inloggen
+          </Link>
           <ButtonLink
             href="/registreren"
             className="hidden bg-gold text-background hover:bg-gold-hover font-semibold md:inline-flex btn-shimmer hover:-translate-y-0.5 hover:shadow-lg hover:shadow-gold/15 transition-all duration-300"
@@ -125,9 +131,22 @@ export function Navbar() {
                 </motion.div>
               ))}
               <motion.div
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: navLinks.length * 0.05, duration: 0.2 }}
+              >
+                <Link
+                  href="/login"
+                  className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground"
+                  onClick={() => setOpen(false)}
+                >
+                  Inloggen
+                </Link>
+              </motion.div>
+              <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15, duration: 0.2 }}
+                transition={{ delay: 0.2, duration: 0.2 }}
               >
                 <ButtonLink
                   href="/registreren"
