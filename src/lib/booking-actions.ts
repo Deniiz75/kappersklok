@@ -2,7 +2,12 @@
 
 import { supabase } from "@/lib/db";
 import { z } from "zod";
+import crypto from "crypto";
 import { sendEmail, bookingConfirmationEmail, barberNotificationEmail, cancellationConfirmationEmail } from "@/lib/email";
+
+function generateId(): string {
+  return crypto.randomBytes(16).toString("hex").slice(0, 25);
+}
 
 const bookingSchema = z.object({
   shopId: z.string().min(1),
@@ -44,10 +49,13 @@ export async function createAppointment(data: unknown): Promise<BookingResult> {
       return { success: false, error: "Dit tijdslot is al bezet. Kies een ander tijdstip." };
     }
 
-    // Create appointment
+    // Create appointment — id + cancelToken moeten expliciet omdat Supabase geen Prisma defaults kent
+    const appointmentId = generateId();
+    const cancelToken = generateId();
     const { data: appointment, error } = await supabase
       .from("Appointment")
       .insert({
+        id: appointmentId,
         shopId: d.shopId,
         barberId: d.barberId,
         serviceId: d.serviceId,
@@ -58,11 +66,16 @@ export async function createAppointment(data: unknown): Promise<BookingResult> {
         customerEmail: d.customerEmail,
         customerPhone: d.customerPhone || null,
         notes: d.notes || null,
+        cancelToken,
+        updatedAt: new Date().toISOString(),
       })
       .select("id, cancelToken")
       .single();
 
-    if (error || !appointment) throw error;
+    if (error || !appointment) {
+      console.error("[createAppointment] Insert failed:", error?.message, error?.details, error?.hint);
+      throw error;
+    }
 
     // Get shop + barber + service names for email
     const { data: shop } = await supabase.from("Shop").select("name, email").eq("id", d.shopId).single();
@@ -93,8 +106,10 @@ export async function createAppointment(data: unknown): Promise<BookingResult> {
     }
 
     return { success: true, appointmentId: appointment.id };
-  } catch {
-    return { success: false, error: "Er ging iets mis. Probeer het later opnieuw." };
+  } catch (err) {
+    console.error("[createAppointment] Error:", err);
+    const msg = err instanceof Error ? err.message : String(err);
+    return { success: false, error: `Fout bij het boeken: ${msg}` };
   }
 }
 
