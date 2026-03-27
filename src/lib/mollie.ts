@@ -1,9 +1,16 @@
-import createMollieClient from "@mollie/api-client";
+import createMollieClient, { type MollieClient } from "@mollie/api-client";
 import { supabase } from "@/lib/db";
 
-const mollieClient = createMollieClient({
-  apiKey: process.env.MOLLIE_API_KEY!,
-});
+let _client: MollieClient | null = null;
+
+function getMollieClient(): MollieClient {
+  if (!_client) {
+    const apiKey = process.env.MOLLIE_API_KEY;
+    if (!apiKey) throw new Error("MOLLIE_API_KEY is niet geconfigureerd");
+    _client = createMollieClient({ apiKey });
+  }
+  return _client;
+}
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
@@ -20,7 +27,7 @@ export async function createRegistrationPayment(
   const now = new Date();
   const period = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
-  const payment = await mollieClient.payments.create({
+  const payment = await getMollieClient().payments.create({
     amount: { currency: "EUR", value: "59.00" },
     description: `Kappersklok registratie — ${shopName}`,
     redirectUrl: `${appUrl}/registreren/betaling`,
@@ -51,7 +58,7 @@ export async function createRegistrationPayment(
  * Als betaald → activeer de shop.
  */
 export async function handleMollieWebhook(molliePaymentId: string) {
-  const payment = await mollieClient.payments.get(molliePaymentId);
+  const payment = await getMollieClient().payments.get(molliePaymentId);
 
   // Vind onze Payment record
   const { data: dbPayment, error: findError } = await supabase
