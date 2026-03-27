@@ -14,13 +14,9 @@ export async function sendEmail({ to, subject, html }: EmailOptions) {
     return true;
   }
 
+  const from = process.env.RESEND_FROM_EMAIL || "Kappersklok <onboarding@resend.dev>";
   const resend = new Resend(apiKey);
-  await resend.emails.send({
-    from: "Kappersklok <noreply@kappersklok.nl>",
-    to,
-    subject,
-    html,
-  });
+  await resend.emails.send({ from, to, subject, html });
 
   return true;
 }
