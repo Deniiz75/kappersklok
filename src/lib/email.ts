@@ -1,5 +1,4 @@
-// Email helper — logs emails in development, ready for Resend/SendGrid in production
-// To enable real emails: npm install resend, set RESEND_API_KEY env var
+import { Resend } from "resend";
 
 interface EmailOptions {
   to: string;
@@ -8,12 +7,21 @@ interface EmailOptions {
 }
 
 export async function sendEmail({ to, subject, html }: EmailOptions) {
-  // In production with Resend:
-  // const resend = new Resend(process.env.RESEND_API_KEY);
-  // await resend.emails.send({ from: 'Kappersklok <noreply@kappersklok.nl>', to, subject, html });
+  const apiKey = process.env.RESEND_API_KEY;
 
-  console.log(`[EMAIL] To: ${to} | Subject: ${subject}`);
-  console.log(`[EMAIL] Body: ${html.substring(0, 200)}...`);
+  if (!apiKey) {
+    console.log(`[EMAIL] (geen API key) To: ${to} | Subject: ${subject}`);
+    return true;
+  }
+
+  const resend = new Resend(apiKey);
+  await resend.emails.send({
+    from: "Kappersklok <noreply@kappersklok.nl>",
+    to,
+    subject,
+    html,
+  });
+
   return true;
 }
 
