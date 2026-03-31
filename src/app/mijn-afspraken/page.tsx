@@ -18,7 +18,9 @@ import {
   CheckCircle,
   XCircle,
   RefreshCw,
+  Bell,
 } from "lucide-react";
+import { WaitlistActions } from "@/components/waitlist-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -114,6 +116,26 @@ export default async function MijnAfsprakenPage() {
     : { data: [] };
   const reviewedIds = new Set((existingReviews || []).map((r: { appointmentId: string }) => r.appointmentId));
 
+  // Fetch waitlist entries
+  const { data: waitlistEntries } = await supabase
+    .from("WaitlistEntry")
+    .select("id, date, status, notifiedAt, createdAt, shop:Shop(name, slug), barber:Barber(name), service:Service(name, duration, price)")
+    .eq("customerEmail", email)
+    .in("status", ["WAITING", "NOTIFIED"])
+    .gte("date", today)
+    .order("date", { ascending: true });
+
+  const waitlist = (waitlistEntries || []) as unknown as Array<{
+    id: string;
+    date: string;
+    status: string;
+    notifiedAt: string | null;
+    createdAt: string;
+    shop: { name: string; slug: string } | null;
+    barber: { name: string } | null;
+    service: { name: string; duration: number; price: number } | null;
+  }>;
+
   return (
     <div>
       <div className="mx-auto max-w-3xl px-4 py-8">
@@ -206,6 +228,69 @@ export default async function MijnAfsprakenPage() {
                   </div>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {/* Waitlist */}
+        {waitlist.length > 0 && (
+          <div className="mb-8">
+            <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-gold mb-4">
+              <Bell className="h-4 w-4" />
+              Wachtlijst ({waitlist.length})
+            </h2>
+            <div className="space-y-3">
+              {waitlist.map((entry) => (
+                <Card key={entry.id} className="border-border bg-surface overflow-hidden">
+                  <CardContent className="p-0">
+                    <div className="flex">
+                      <div className={`flex w-20 shrink-0 flex-col items-center justify-center border-r py-4 ${
+                        entry.status === "NOTIFIED" ? "bg-green-500/5 border-green-500/10" : "bg-gold/5 border-gold/10"
+                      }`}>
+                        <Bell className={`h-5 w-5 ${entry.status === "NOTIFIED" ? "text-green-500" : "text-gold/60"}`} />
+                        <span className="text-[10px] text-muted-foreground mt-1">
+                          {new Date(entry.date).getDate()} {monthNames[new Date(entry.date).getMonth()]}
+                        </span>
+                      </div>
+                      <div className="flex-1 p-4">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-sm font-semibold">{entry.service?.name}</p>
+                            <div className="mt-1 space-y-0.5">
+                              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                <MapPin className="h-3 w-3 shrink-0" />{entry.shop?.name}
+                              </p>
+                              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                <Scissors className="h-3 w-3 shrink-0" />{entry.barber?.name}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end gap-2">
+                            {entry.status === "NOTIFIED" ? (
+                              <>
+                                <span className="rounded-full bg-green-500/10 px-2 py-0.5 text-[10px] font-medium text-green-500">
+                                  Plek beschikbaar!
+                                </span>
+                                <Link
+                                  href={`/kapperszaak/${entry.shop?.slug}`}
+                                  className="text-[10px] font-semibold text-gold hover:text-gold-hover transition-colors"
+                                >
+                                  Nu boeken →
+                                </Link>
+                              </>
+                            ) : (
+                              <span className="rounded-full bg-gold/10 px-2 py-0.5 text-[10px] font-medium text-gold">
+                                Wachtend
+                              </span>
+                            )}
+                            <WaitlistActions entryId={entry.id} customerEmail={email} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         )}

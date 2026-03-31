@@ -54,5 +54,12 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // Expire old waitlist entries (date has passed)
+  await supabase
+    .from("WaitlistEntry")
+    .update({ status: "EXPIRED" })
+    .in("status", ["WAITING", "NOTIFIED"])
+    .lt("date", tomorrowStr);
+
   return NextResponse.json({ sent });
 }

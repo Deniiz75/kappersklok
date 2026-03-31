@@ -45,10 +45,11 @@ model Shop {
   barbers        Barber[]
   services       Service[]
   businessHours  BusinessHours[]
-  appointments   Appointment[]
-  reviews        Review[]
-  payments       Payment[]
-  favorites      Favorite[]
+  appointments    Appointment[]
+  reviews         Review[]
+  payments        Payment[]
+  favorites       Favorite[]
+  waitlistEntries WaitlistEntry[]
 }
 
 model Barber {
@@ -56,9 +57,10 @@ model Barber {
   name         String
   shopId       String
   shop         Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  active       Boolean       @default(true)
-  createdAt    DateTime      @default(now())
-  appointments Appointment[]
+  active          Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  appointments    Appointment[]
+  waitlistEntries WaitlistEntry[]
 }
 
 model Service {
@@ -68,10 +70,11 @@ model Service {
   price        Int
   shopId       String
   shop         Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  active       Boolean       @default(true)
-  sortOrder    Int           @default(0)
-  createdAt    DateTime      @default(now())
-  appointments Appointment[]
+  active          Boolean         @default(true)
+  sortOrder       Int             @default(0)
+  createdAt       DateTime        @default(now())
+  appointments    Appointment[]
+  waitlistEntries WaitlistEntry[]
 }
 
 model BusinessHours {
@@ -191,4 +194,30 @@ enum AppointmentStatus {
   CANCELLED
   COMPLETED
   NO_SHOW
+}
+
+enum WaitlistStatus {
+  WAITING
+  NOTIFIED
+  EXPIRED
+  CANCELLED
+}
+
+model WaitlistEntry {
+  id            String         @id @default(cuid())
+  shopId        String
+  shop          Shop           @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  barberId      String
+  barber        Barber         @relation(fields: [barberId], references: [id])
+  serviceId     String
+  service       Service        @relation(fields: [serviceId], references: [id])
+  date          DateTime       @db.Date
+  customerName  String
+  customerEmail String
+  customerPhone String?
+  status        WaitlistStatus @default(WAITING)
+  notifiedAt    DateTime?
+  createdAt     DateTime       @default(now())
+
+  @@index([shopId, barberId, date, status])
 }

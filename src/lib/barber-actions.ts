@@ -3,6 +3,7 @@
 import { supabase } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { sendEmail, cancellationConfirmationEmail } from "@/lib/email";
+import { notifyWaitlistForCancellation } from "@/lib/booking-actions";
 
 async function requireBarberShop() {
   const session = await getSession();
@@ -66,7 +67,7 @@ export async function barberCancelAppointment(appointmentId: string) {
 
   const { data: apt } = await supabase
     .from("Appointment")
-    .select("id, customerName, customerEmail, date, startTime, serviceId")
+    .select("id, customerName, customerEmail, date, startTime, endTime, barberId, serviceId")
     .eq("id", appointmentId)
     .single();
 
@@ -94,6 +95,11 @@ export async function barberCancelAppointment(appointmentId: string) {
     });
     sendEmail({ to: apt.customerEmail, ...email }).catch(() => {});
   }
+
+  // Notify waitlisted customers
+  notifyWaitlistForCancellation(
+    shop.id, apt.barberId, apt.date, apt.startTime, apt.endTime,
+  ).catch(() => {});
 
   return { success: true };
 }
