@@ -18,7 +18,9 @@
       "bundleIdentifier": "nl.kappersklok.app",
       "infoPlist": {
         "NSCameraUsageDescription": "Voor profielfoto's",
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
       }
     },
     "android": {
@@ -53,14 +55,16 @@
     ],
     "extra": {
       "eas": {
-        "projectId": ""
-      }
+        "projectId": "0f9181cc-4b9d-4e69-ab00-dbe8350b9214"
+      },
+      "router": {}
     },
     "updates": {
       "url": ""
     },
     "runtimeVersion": {
       "policy": "appVersion"
-    }
+    },
+    "owner": "deniiz75"
   }
 }

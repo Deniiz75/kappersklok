@@ -7,8 +7,8 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "ios": {
-        "simulator": true
+      "android": {
+        "buildType": "apk"
       },
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://qxoikyfmjffkeyyzpxgd.supabase.co",
@@ -34,10 +34,6 @@
   },
   "submit": {
     "production": {
-      "ios": {
-        "ascAppId": "",
-        "appleTeamId": ""
-      },
       "android": {
         "track": "internal"
       }
