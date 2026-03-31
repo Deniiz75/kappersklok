@@ -19,6 +19,12 @@ import {
 import {
   toggleFavorite,
 } from "@kappersklok/supabase";
+import {
+  getAppointmentsForShop,
+  getShopServices,
+  getShopBarbers,
+  getShopBusinessHours,
+} from "@kappersklok/supabase";
 
 // --- Queries ---
 
@@ -121,6 +127,57 @@ export function useToggleFavorite() {
       toggleFavorite(supabase, email, shopId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["favorites"] });
+    },
+  });
+}
+
+// --- Barber hooks ---
+
+export function useShopAppointments(shopId: string | undefined, date?: string) {
+  return useQuery({
+    queryKey: ["shopAppointments", shopId, date],
+    queryFn: () => getAppointmentsForShop(supabase, shopId!, date),
+    enabled: !!shopId,
+    refetchInterval: 30_000,
+  });
+}
+
+export function useBarberServices(shopId: string | undefined) {
+  return useQuery({
+    queryKey: ["shopServices", shopId],
+    queryFn: () => getShopServices(supabase, shopId!),
+    enabled: !!shopId,
+  });
+}
+
+export function useBarberBarbers(shopId: string | undefined) {
+  return useQuery({
+    queryKey: ["shopBarbers", shopId],
+    queryFn: () => getShopBarbers(supabase, shopId!),
+    enabled: !!shopId,
+  });
+}
+
+export function useBarberHours(shopId: string | undefined) {
+  return useQuery({
+    queryKey: ["shopHours", shopId],
+    queryFn: () => getShopBusinessHours(supabase, shopId!),
+    enabled: !!shopId,
+  });
+}
+
+export function useBarberShop() {
+  const { data: session } = { data: null as unknown }; // placeholder
+  // In real implementation, we'd look up the shop by the auth user's ID
+  // For now, we store the shopId in AsyncStorage after barber login
+  return useQuery({
+    queryKey: ["barberShop"],
+    queryFn: async () => {
+      const AsyncStorage = require("@react-native-async-storage/async-storage").default;
+      const shopId = await AsyncStorage.getItem("kk-barber-shopId");
+      if (!shopId) return null;
+      const { data } = await supabase.from("Shop").select("*").eq("id", shopId).single();
+      return data;
     },
   });
 }
