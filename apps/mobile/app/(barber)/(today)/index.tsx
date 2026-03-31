@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from "react-native";
+import { useState, useEffect, useCallback } from "react";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LayoutDashboard, ArrowLeftRight, LogOut, Check, X, Clock, UserX } from "lucide-react-native";
 import { useAuth } from "../../../lib/auth-context";
@@ -15,7 +15,13 @@ export default function TodayScreen() {
   const [shopId, setShopId] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const today = new Date().toISOString().split("T")[0];
-  const { data: appointments, isLoading } = useShopAppointments(shopId || undefined, today);
+  const { data: appointments, isLoading, refetch } = useShopAppointments(shopId || undefined, today);
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  }, [refetch]);
 
   // Load barber's shop
   useEffect(() => {
@@ -99,6 +105,7 @@ export default function TodayScreen() {
           data={confirmed}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: 16, gap: 10 }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.gold} />}
           renderItem={({ item: apt }) => (
             <View style={styles.card}>
               <View style={styles.cardHeader}>

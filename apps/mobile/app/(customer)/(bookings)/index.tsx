@@ -1,4 +1,5 @@
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from "react-native";
+import { useState, useCallback } from "react";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { CalendarDays, Clock, MapPin, Scissors, Bell, Check, X } from "lucide-react-native";
@@ -13,7 +14,13 @@ export default function BookingsScreen() {
   const { session } = useAuth();
   const email = session?.user.email;
   const router = useRouter();
-  const { data: appointments, isLoading } = useMyAppointments(email);
+  const { data: appointments, isLoading, refetch } = useMyAppointments(email);
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  }, [refetch]);
   const { data: waitlist = [] } = useMyWaitlist(email);
   const cancelAppointment = useCancelAppointment();
   const cancelWaitlistEntry = useCancelWaitlistEntry();
@@ -62,6 +69,7 @@ export default function BookingsScreen() {
       <FlatList
         data={[]}
         renderItem={() => null}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.gold} />}
         ListHeaderComponent={
           <>
             <View style={styles.header}>

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { supabase } from "./supabase";
 import type { Session } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { registerForPushNotifications, unregisterPushToken } from "./notifications";
 
 type Mode = "customer" | "barber";
 
@@ -38,6 +39,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      // Register push token on sign in
+      if (session?.user.email) {
+        AsyncStorage.getItem("kk-mode").then((m) => {
+          const type = m === "barber" ? "BARBER" : "CUSTOMER";
+          registerForPushNotifications(session.user.email!, type).catch(() => {});
+        });
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -69,6 +77,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOut() {
+    if (session?.user.email) {
+      unregisterPushToken(session.user.email).catch(() => {});
+    }
     await supabase.auth.signOut();
     setSession(null);
   }

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+import { useState, useCallback } from "react";
+import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Search, MapPin, Users, ChevronRight } from "lucide-react-native";
@@ -8,8 +8,14 @@ import { colors } from "../../../lib/theme";
 
 export default function SearchScreen() {
   const router = useRouter();
-  const { data: shops, isLoading } = useShops();
+  const { data: shops, isLoading, refetch } = useShops();
   const [query, setQuery] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  }, [refetch]);
 
   const filtered = query
     ? (shops || []).filter(
@@ -74,6 +80,7 @@ export default function SearchScreen() {
           data={filtered}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: 16, gap: 12 }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.gold} />}
           renderItem={({ item: shop }) => (
             <TouchableOpacity
               style={styles.card}

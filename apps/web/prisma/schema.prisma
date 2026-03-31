@@ -221,3 +221,16 @@ model WaitlistEntry {
 
   @@index([shopId, barberId, date, status])
 }
+
+model PushToken {
+  id             String   @id @default(cuid())
+  userEmail      String
+  userType       String   // "CUSTOMER" | "BARBER"
+  expoPushToken  String
+  deviceId       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now())
+
+  @@unique([userEmail, expoPushToken])
+  @@index([userEmail, userType])
+}
