@@ -3,7 +3,8 @@ import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, Activi
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ChevronLeft, Scissors, User, CalendarDays, Clock, Bell, Check } from "lucide-react-native";
-import { useShop, useBookedSlots, useCreateAppointment, useJoinWaitlist } from "../../../../lib/hooks";
+import { useBookedSlots, useCreateAppointment, useJoinWaitlist } from "../../../../lib/hooks";
+import { supabase } from "../../../../lib/supabase";
 import { colors } from "../../../../lib/theme";
 import { formatPrice, generateTimeSlots, addMinutes, timeToMinutes } from "@kappersklok/shared";
 
@@ -12,7 +13,7 @@ const shortDays = ["Zo", "Ma", "Di", "Wo", "Do", "Vr", "Za"];
 export default function BookScreen() {
   const { shopId } = useLocalSearchParams<{ shopId: string }>();
   const router = useRouter();
-  const { data: shop, isLoading: shopLoading } = useShop(""); // We need shop by ID
+  // Shop data loaded via useEffect below (we need by ID, not slug)
   const createAppointment = useCreateAppointment();
   const joinWaitlist = useJoinWaitlist();
 
@@ -35,7 +36,6 @@ export default function BookScreen() {
 
   // Fetch shop by ID
   useEffect(() => {
-    const { supabase } = require("../../../../lib/supabase");
     async function load() {
       const [{ data: s }, { data: barbers }, { data: services }, { data: hours }] = await Promise.all([
         supabase.from("Shop").select("*").eq("id", shopId).single(),

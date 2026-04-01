@@ -167,13 +167,10 @@ export function useBarberHours(shopId: string | undefined) {
 }
 
 export function useBarberShop() {
-  const { data: session } = { data: null as unknown }; // placeholder
-  // In real implementation, we'd look up the shop by the auth user's ID
-  // For now, we store the shopId in AsyncStorage after barber login
   return useQuery({
     queryKey: ["barberShop"],
     queryFn: async () => {
-      const AsyncStorage = require("@react-native-async-storage/async-storage").default;
+      const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
       const shopId = await AsyncStorage.getItem("kk-barber-shopId");
       if (!shopId) return null;
       const { data } = await supabase.from("Shop").select("*").eq("id", shopId).single();
