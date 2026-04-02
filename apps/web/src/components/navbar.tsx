@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { ButtonLink } from "@/components/button-link";
 import { BrandLink } from "@/components/brand-link";
 
 const navLinks = [
-  { href: "/kapper-zoeken", label: "Kapper Zoeken" },
-  { href: "/informatie", label: "Info" },
+  { href: "/kapper-zoeken", label: "Kappers zoeken" },
+  { href: "/informatie", label: "Hoe het werkt" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -18,7 +18,7 @@ export function Navbar() {
 
   useEffect(() => {
     function handleScroll() {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 10);
     }
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
@@ -26,82 +26,67 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50">
-      {/* Glassmorphism container */}
       <div
-        className={`transition-all duration-500 ${
-          scrolled
-            ? "mx-2 mt-2 rounded-2xl border border-border bg-white/90 backdrop-blur-2xl shadow-lg shadow-black/5"
-            : "border-b border-border bg-white"
+        className={`border-b bg-white transition-shadow duration-300 ${
+          scrolled ? "shadow-sm" : "border-transparent"
         }`}
       >
-        <div className={`mx-auto flex max-w-6xl items-center px-4 transition-all duration-500 ${
-          scrolled ? "h-14" : "h-16"
-        }`}>
-          {/* Left: hamburger on mobile, nav links on desktop */}
-          <div className="flex flex-1 items-center md:gap-6">
-            <motion.button
-              className="relative mr-2 h-5 w-6 md:hidden"
-              onClick={() => setOpen(!open)}
-              aria-label="Menu"
-              whileTap={{ scale: 0.9 }}
-            >
-              <span
-                className={`absolute left-0 block h-[1.5px] w-full bg-foreground/80 transition-all duration-400 ease-in-out ${
-                  open ? "top-[9px] rotate-45" : "top-0 rotate-0"
-                }`}
-              />
-              <span
-                className={`absolute left-0 top-[9px] block h-[1.5px] bg-foreground/80 transition-all duration-400 ease-in-out ${
-                  open ? "w-0 opacity-0" : "w-5 opacity-100"
-                }`}
-              />
-              <span
-                className={`absolute left-0 block h-[1.5px] w-full bg-foreground/80 transition-all duration-400 ease-in-out ${
-                  open ? "top-[9px] -rotate-45" : "top-[18px] rotate-0"
-                }`}
-              />
-            </motion.button>
-            <nav className="hidden items-center gap-1 md:flex">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="relative px-3 py-1.5 text-sm text-foreground/60 transition-all duration-200 hover:text-foreground rounded-lg hover:bg-foreground/[0.05]"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 h-16">
+          {/* Left: logo */}
+          <div className="flex items-center">
+            <BrandLink logoSize={32} wordmarkSize="md" />
           </div>
 
-          {/* Center: brand logo */}
-          <motion.div
-            className="flex items-center justify-center"
-            whileHover={{ scale: 1.03 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
-          >
-            <div className="hidden sm:block">
-              <BrandLink logoSize={scrolled ? 30 : 36} wordmarkSize="md" showTagline={!scrolled} />
-            </div>
-            <div className="sm:hidden">
-              <BrandLink logoSize={32} wordmarkSize="sm" />
-            </div>
-          </motion.div>
+          {/* Center: nav links (desktop) */}
+          <nav className="hidden items-center gap-1 md:flex">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground rounded-lg"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
 
-          {/* Right */}
-          <div className="flex flex-1 items-center justify-end gap-3">
+          {/* Right: login + CTA */}
+          <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="hidden text-sm text-foreground/60 transition-all duration-200 hover:text-foreground px-3 py-1.5 rounded-lg hover:bg-foreground/[0.05] md:inline-flex"
+              className="hidden text-sm text-muted-foreground transition-colors hover:text-foreground md:inline-flex"
             >
               Inloggen
             </Link>
             <ButtonLink
               href="/registreren"
-              className="hidden bg-[#2ECC71] text-white hover:bg-[#27AE60] font-semibold md:inline-flex rounded-xl hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#2ECC71]/20 transition-all duration-300 text-xs px-5 py-2"
+              className="hidden bg-foreground text-white hover:bg-foreground/90 font-medium md:inline-flex rounded-full text-sm px-5 py-2.5"
             >
-              Kapperszaak Registreren
+              Registreren
             </ButtonLink>
+
+            {/* Mobile hamburger */}
+            <button
+              className="relative h-5 w-6 md:hidden"
+              onClick={() => setOpen(!open)}
+              aria-label="Menu"
+            >
+              <span
+                className={`absolute left-0 block h-[1.5px] w-full bg-foreground transition-all duration-300 ${
+                  open ? "top-[9px] rotate-45" : "top-0"
+                }`}
+              />
+              <span
+                className={`absolute left-0 top-[9px] block h-[1.5px] bg-foreground transition-all duration-300 ${
+                  open ? "w-0 opacity-0" : "w-5 opacity-100"
+                }`}
+              />
+              <span
+                className={`absolute left-0 block h-[1.5px] w-full bg-foreground transition-all duration-300 ${
+                  open ? "top-[9px] -rotate-45" : "top-[18px]"
+                }`}
+              />
+            </button>
           </div>
         </div>
       </div>
@@ -113,55 +98,36 @@ export function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-            className={`overflow-hidden ${
-              scrolled ? "mx-2 rounded-b-2xl" : ""
-            } border-t border-border bg-white/90 backdrop-blur-2xl md:hidden`}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden border-b border-border bg-white md:hidden"
           >
             <nav className="flex flex-col gap-1 px-4 pb-4 pt-3">
-              {navLinks.map((link, i) => (
-                <motion.div
-                  key={link.href}
-                  initial={{ opacity: 0, x: -12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05, duration: 0.2 }}
-                >
-                  <Link
-                    href={link.href}
-                    className="block rounded-lg px-3 py-2.5 text-sm text-foreground/60 transition-colors hover:text-foreground hover:bg-foreground/[0.05]"
-                    onClick={() => setOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                </motion.div>
-              ))}
-              <motion.div
-                initial={{ opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: navLinks.length * 0.05, duration: 0.2 }}
-              >
+              {navLinks.map((link) => (
                 <Link
-                  href="/login"
-                  className="block rounded-lg px-3 py-2.5 text-sm text-foreground/60 transition-colors hover:text-foreground hover:bg-foreground/[0.05]"
+                  key={link.href}
+                  href={link.href}
+                  className="block rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted"
                   onClick={() => setOpen(false)}
                 >
-                  Inloggen
+                  {link.label}
                 </Link>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.2 }}
-                className="pt-2"
+              ))}
+              <Link
+                href="/login"
+                className="block rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted"
+                onClick={() => setOpen(false)}
               >
+                Inloggen
+              </Link>
+              <div className="pt-2">
                 <ButtonLink
                   href="/registreren"
-                  className="bg-[#2ECC71] text-white hover:bg-[#27AE60] font-semibold w-full rounded-xl"
+                  className="bg-foreground text-white hover:bg-foreground/90 font-medium w-full rounded-full"
                   onClick={() => setOpen(false)}
                 >
-                  Kapperszaak Registreren
+                  Registreren
                 </ButtonLink>
-              </motion.div>
+              </div>
             </nav>
           </motion.div>
         )}
