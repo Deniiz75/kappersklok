@@ -4,9 +4,9 @@ import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { TamaguiProvider, Theme } from "tamagui";
+import config from "../tamagui.config";
 import { AuthProvider } from "../lib/auth-context";
-import { colors } from "../lib/theme";
-import { View } from "react-native";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,13 +26,15 @@ const persister = createAsyncStoragePersister({
 
 export default function RootLayout() {
   return (
-    <PersistQueryClientProvider client={queryClient} persistOptions={{ persister, maxAge: 24 * 60 * 60 * 1000 }}>
-      <AuthProvider>
-        <View style={{ flex: 1, backgroundColor: colors.background }}>
-          <Slot />
-          <StatusBar style="light" />
-        </View>
-      </AuthProvider>
-    </PersistQueryClientProvider>
+    <TamaguiProvider config={config} defaultTheme="dark">
+      <Theme name="dark">
+        <PersistQueryClientProvider client={queryClient} persistOptions={{ persister, maxAge: 24 * 60 * 60 * 1000 }}>
+          <AuthProvider>
+            <Slot />
+            <StatusBar style="light" />
+          </AuthProvider>
+        </PersistQueryClientProvider>
+      </Theme>
+    </TamaguiProvider>
   );
 }
