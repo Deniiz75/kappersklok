@@ -73,7 +73,7 @@ export function SearchBar() {
         {/* Search button */}
         <button
           type="submit"
-          className="flex items-center gap-2 h-12 px-6 bg-gold text-background font-semibold text-sm hover:bg-gold-hover transition-colors whitespace-nowrap"
+          className="flex items-center gap-2 h-12 px-6 bg-[#2ECC71] text-white font-semibold text-sm hover:bg-[#27AE60] transition-all rounded-r-xl whitespace-nowrap"
         >
           <Search className="h-4 w-4" />
           <span className="hidden sm:inline">Zoeken</span>

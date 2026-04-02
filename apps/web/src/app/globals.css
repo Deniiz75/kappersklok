@@ -171,8 +171,8 @@
 }
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 30px -8px rgba(184, 146, 63, 0.12);
-  border-color: rgba(184, 146, 63, 0.3);
+  box-shadow: 0 12px 30px -8px rgba(46, 204, 113, 0.1);
+  border-color: rgba(46, 204, 113, 0.3);
 }
 
 .card-hover-subtle {

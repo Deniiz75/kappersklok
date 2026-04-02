@@ -92,13 +92,13 @@ export function Navbar() {
           <div className="flex flex-1 items-center justify-end gap-3">
             <Link
               href="/login"
-              className="hidden text-sm text-foreground/60 transition-all duration-200 hover:text-foreground md:inline-flex"
+              className="hidden text-sm text-foreground/60 transition-all duration-200 hover:text-foreground px-3 py-1.5 rounded-lg hover:bg-foreground/[0.05] md:inline-flex"
             >
               Inloggen
             </Link>
             <ButtonLink
               href="/registreren"
-              className="hidden bg-gold text-background hover:bg-gold-hover font-semibold md:inline-flex btn-shimmer hover:-translate-y-0.5 hover:shadow-lg hover:shadow-gold/20 transition-all duration-300 text-xs px-4 py-2"
+              className="hidden bg-[#2ECC71] text-white hover:bg-[#27AE60] font-semibold md:inline-flex rounded-xl hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#2ECC71]/20 transition-all duration-300 text-xs px-5 py-2"
             >
               Kapperszaak Registreren
             </ButtonLink>
@@ -156,7 +156,7 @@ export function Navbar() {
               >
                 <ButtonLink
                   href="/registreren"
-                  className="bg-gold text-background hover:bg-gold-hover font-semibold w-full btn-shimmer"
+                  className="bg-[#2ECC71] text-white hover:bg-[#27AE60] font-semibold w-full rounded-xl"
                   onClick={() => setOpen(false)}
                 >
                   Kapperszaak Registreren
