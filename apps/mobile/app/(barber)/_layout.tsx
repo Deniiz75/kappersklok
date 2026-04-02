@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { CalendarDays, Scissors, Settings, LayoutDashboard } from "lucide-react-native";
+import { Feather } from "@expo/vector-icons";
 import { colors } from "../../lib/theme";
 
 export default function BarberLayout() {
@@ -22,19 +22,19 @@ export default function BarberLayout() {
     >
       <Tabs.Screen
         name="(today)"
-        options={{ tabBarIcon: ({ color }) => <LayoutDashboard size={24} color={color} /> }}
+        options={{ tabBarIcon: ({ color, size }) => <Feather name="home" size={size} color={color} /> }}
       />
       <Tabs.Screen
         name="(agenda)"
-        options={{ tabBarIcon: ({ color }) => <CalendarDays size={24} color={color} /> }}
+        options={{ tabBarIcon: ({ color, size }) => <Feather name="calendar" size={size} color={color} /> }}
       />
       <Tabs.Screen
         name="(services)"
-        options={{ tabBarIcon: ({ color }) => <Scissors size={24} color={color} /> }}
+        options={{ tabBarIcon: ({ color, size }) => <Feather name="scissors" size={size} color={color} /> }}
       />
       <Tabs.Screen
         name="(settings)"
-        options={{ tabBarIcon: ({ color }) => <Settings size={24} color={color} /> }}
+        options={{ tabBarIcon: ({ color, size }) => <Feather name="settings" size={size} color={color} /> }}
       />
     </Tabs>
   );

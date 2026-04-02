@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Search, CalendarDays, Heart, User } from "lucide-react-native";
+import { Feather } from "@expo/vector-icons";
 import { colors } from "../../lib/theme";
 
 export default function CustomerLayout() {
@@ -22,19 +22,19 @@ export default function CustomerLayout() {
     >
       <Tabs.Screen
         name="(search)"
-        options={{ tabBarIcon: ({ color }) => <Search size={24} color={color} /> }}
+        options={{ tabBarIcon: ({ color, size }) => <Feather name="search" size={size} color={color} /> }}
       />
       <Tabs.Screen
         name="(bookings)"
-        options={{ tabBarIcon: ({ color }) => <CalendarDays size={24} color={color} /> }}
+        options={{ tabBarIcon: ({ color, size }) => <Feather name="calendar" size={size} color={color} /> }}
       />
       <Tabs.Screen
         name="(favorites)"
-        options={{ tabBarIcon: ({ color }) => <Heart size={24} color={color} /> }}
+        options={{ tabBarIcon: ({ color, size }) => <Feather name="heart" size={size} color={color} /> }}
       />
       <Tabs.Screen
         name="(profile)"
-        options={{ tabBarIcon: ({ color }) => <User size={24} color={color} /> }}
+        options={{ tabBarIcon: ({ color, size }) => <Feather name="user" size={size} color={color} /> }}
       />
     </Tabs>
   );
