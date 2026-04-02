@@ -30,8 +30,8 @@ export function Navbar() {
       <div
         className={`transition-all duration-500 ${
           scrolled
-            ? "mx-2 mt-2 rounded-2xl border border-border bg-white/70 backdrop-blur-2xl shadow-lg shadow-black/5"
-            : "border-b border-border/50 bg-white/50 backdrop-blur-md"
+            ? "mx-2 mt-2 rounded-2xl border border-border bg-white/90 backdrop-blur-2xl shadow-lg shadow-black/5"
+            : "border-b border-border bg-white"
         }`}
       >
         <div className={`mx-auto flex max-w-6xl items-center px-4 transition-all duration-500 ${
