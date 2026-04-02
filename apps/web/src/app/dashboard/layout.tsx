@@ -67,7 +67,6 @@ export default async function DashboardLayout({
     if (!shop) redirect("/");
   }
 
-  // Payment gate: PENDING shops moeten eerst betalen
   if (!isAdmin && shop && shop.status === "PENDING") {
     return <PaymentGate shopId={shop.id} shopName={shop.name} />;
   }
@@ -78,26 +77,30 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen">
-      {/* Desktop sidebar */}
-      <aside className="hidden w-64 shrink-0 border-r border-border bg-surface md:flex md:flex-col">
-        <div className="flex h-16 items-center gap-3 border-b border-border px-4">
+      {/* Desktop sidebar — clean white */}
+      <aside className="hidden w-64 shrink-0 border-r border-border bg-white md:flex md:flex-col">
+        <div className="flex h-16 items-center gap-3 border-b border-border px-5">
           <Logo size={28} />
           <Wordmark size="sm" />
         </div>
-        <div className="flex-1 p-3">
-          <div className="mb-4 rounded-xl bg-gold/5 border border-gold/20 p-3">
+
+        <div className="flex-1 px-3 py-4">
+          {/* Shop/admin info */}
+          <div className="mb-5 rounded-xl bg-muted px-4 py-3">
             <div className="flex items-center gap-2">
-              {isAdmin && <ShieldCheck className="h-4 w-4 text-gold shrink-0" />}
-              <p className="text-sm font-semibold truncate">{label}</p>
+              {isAdmin && <ShieldCheck className="h-4 w-4 text-muted-foreground shrink-0" />}
+              <p className="text-sm font-semibold text-foreground truncate">{label}</p>
             </div>
-            <p className="text-xs text-muted-foreground truncate">{sublabel}</p>
+            {sublabel && <p className="text-xs text-muted-foreground truncate mt-0.5">{sublabel}</p>}
           </div>
+
+          {/* Navigation */}
           <nav className="space-y-0.5">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 <item.icon className="h-4 w-4 shrink-0" />
                 {item.label}
@@ -105,11 +108,13 @@ export default async function DashboardLayout({
             ))}
           </nav>
         </div>
-        <div className="border-t border-border p-3">
+
+        {/* Logout */}
+        <div className="border-t border-border px-3 py-3">
           <form action="/api/logout" method="POST">
             <button
               type="submit"
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <LogOut className="h-4 w-4" />
               Uitloggen
@@ -119,9 +124,9 @@ export default async function DashboardLayout({
       </aside>
 
       {/* Main area */}
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col bg-muted/30">
         {/* Mobile header */}
-        <header className="flex h-14 items-center justify-between border-b border-border bg-background px-4 md:hidden">
+        <header className="flex h-14 items-center justify-between border-b border-border bg-white px-4 md:hidden">
           <Link href="/dashboard" className="flex items-center gap-2.5">
             <Logo size={26} />
             <div className="flex flex-col leading-none">
@@ -130,9 +135,9 @@ export default async function DashboardLayout({
             </div>
           </Link>
           {isAdmin && (
-            <div className="flex h-6 items-center gap-1 rounded-full bg-gold/10 px-2">
-              <ShieldCheck className="h-3 w-3 text-gold" />
-              <span className="text-[10px] font-medium text-gold">Admin</span>
+            <div className="flex h-6 items-center gap-1 rounded-full bg-muted px-2">
+              <ShieldCheck className="h-3 w-3 text-muted-foreground" />
+              <span className="text-[10px] font-medium text-muted-foreground">Admin</span>
             </div>
           )}
         </header>
