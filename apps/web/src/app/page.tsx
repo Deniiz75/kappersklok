@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {
   Search, CalendarDays, Scissors, Bell, RefreshCw, Monitor, Tablet, Globe,
-  ShieldCheck, Star, ArrowRight, MapPin, ChevronRight, Clock, Quote,
+  ShieldCheck, Star, ArrowRight, MapPin, ChevronRight, Clock,
   Smartphone, Users, CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -58,26 +58,33 @@ export default async function Home() {
       <OrganizationSchema />
 
       {/* ══════════ DARK HERO SECTION ══════════ */}
-      <section className="relative overflow-hidden bg-[#1A1A1A] bg-grid-dark">
-        {/* Decorative geometric shapes like knipklok */}
+      <section className="relative overflow-hidden bg-[#1A1A1A] bg-grid-dark noise-overlay">
+        {/* Animated glow orbs */}
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-[5%] top-[10%] h-20 w-20 rotate-45 border-2 border-white/[0.06] opacity-60" />
-          <div className="absolute left-[12%] top-[30%] h-14 w-14 rotate-12 border-2 border-white/[0.04]" />
-          <div className="absolute left-[3%] top-[50%] h-24 w-24 -rotate-12 bg-white/[0.02]" />
-          <div className="absolute right-[8%] top-[15%] h-16 w-16 rotate-45 border-2 border-white/[0.05]" />
-          <div className="absolute right-[15%] top-[40%] h-20 w-20 rotate-[30deg] border-2 border-white/[0.04]" />
-          <div className="absolute right-[3%] bottom-[20%] h-28 w-28 rotate-45 bg-white/[0.02]" />
-          <div className="absolute left-[20%] bottom-[15%] h-10 w-10 rotate-45 bg-white/[0.03]" />
-          <div className="absolute right-[25%] bottom-[10%] h-12 w-12 -rotate-12 border-2 border-white/[0.04]" />
+          <div className="absolute -left-20 top-[10%] h-[300px] w-[300px] rounded-full bg-[#2ECC71]/[0.07] blur-[100px] animate-glow-drift-1 md:h-[400px] md:w-[400px]" />
+          <div className="absolute -right-20 bottom-[5%] h-[250px] w-[250px] rounded-full bg-[#B8923F]/[0.06] blur-[100px] animate-glow-drift-2 md:h-[350px] md:w-[350px]" />
         </div>
 
-        <div className="relative mx-auto max-w-6xl px-4 pt-20 pb-8 md:pt-28 md:pb-12">
+        {/* Radial gradient center glow */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(46,204,113,0.06)_0%,transparent_70%)]" />
+
+        {/* Floating barber icons */}
+        <div className="pointer-events-none absolute inset-0">
+          <Scissors className="absolute left-[8%] top-[18%] h-6 w-6 text-white/[0.08] animate-float-slow" />
+          <Clock className="absolute right-[10%] top-[22%] h-7 w-7 text-[#B8923F]/[0.10] animate-float-reverse" />
+          <Scissors className="absolute left-[15%] bottom-[20%] h-5 w-5 text-[#2ECC71]/[0.08] rotate-45 animate-float-reverse" />
+          <Clock className="absolute right-[18%] bottom-[25%] h-5 w-5 text-white/[0.06] animate-float-slow" />
+          <Scissors className="absolute left-[50%] top-[8%] h-4 w-4 text-white/[0.05] -rotate-12 animate-float-slow" />
+        </div>
+
+        <div className="relative mx-auto max-w-6xl px-4 pt-24 pb-16 md:pt-32 md:pb-20">
           <div className="text-center">
             <FadeIn>
-              <p className="text-white/60 text-sm mb-2">Welkom bij</p>
-              <h1 className="font-heading text-4xl font-bold tracking-tight text-white md:text-6xl lg:text-7xl">
+              <p className="text-white/50 text-sm tracking-widest uppercase mb-3">Welkom bij</p>
+              <h1 className="font-heading text-4xl font-bold tracking-tight text-gradient-gold md:text-6xl lg:text-7xl">
                 KAPPERSKLOK
               </h1>
+              <div className="mx-auto mt-4 h-0.5 w-16 rounded-full bg-gradient-to-r from-transparent via-[#2ECC71] to-transparent" />
             </FadeIn>
 
             <FadeIn delay={0.2}>
@@ -87,34 +94,10 @@ export default async function Home() {
             </FadeIn>
           </div>
 
-          {/* Testimonial slider in dark hero */}
+          {/* Testimonial slider */}
           <FadeIn delay={0.4}>
-            <div className="mx-auto mt-10 max-w-lg">
-              <div className="relative min-h-[160px]">
-                {testimonials.map((t, i) => (
-                  <div key={t.name} className={`${i === 0 ? "" : "hidden"}`}>
-                    <div className="flex gap-3">
-                      <Quote className="h-5 w-5 text-[#2ECC71]/60 shrink-0 mt-1" />
-                      <div>
-                        <p className="text-sm text-white/70 italic leading-relaxed">{t.text}</p>
-                        <div className="mt-3 flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10">
-                            <span className="text-xs font-bold text-white">{t.name[0]}</span>
-                          </div>
-                          <div>
-                            <p className="text-sm font-semibold text-white">{t.name}</p>
-                            <p className="text-xs text-white/50">{t.shop}</p>
-                          </div>
-                          <div className="flex items-center gap-1 ml-auto">
-                            <span className="text-xs text-white/40">Vorige</span>
-                            <span className="text-xs text-white/40 ml-3">Volgende</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div className="mx-auto mt-12 max-w-lg [--foreground:#fff] [--muted-foreground:#999] [--surface:rgba(255,255,255,0.06)] [--border:rgba(255,255,255,0.12)] [--gold:#B8923F]">
+              <TestimonialSlider testimonials={testimonials} />
             </div>
           </FadeIn>
         </div>
