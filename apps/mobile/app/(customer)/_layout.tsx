@@ -8,44 +8,33 @@ export default function CustomerLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopColor: colors.border,
-          borderTopWidth: 1,
-          height: 56,
-          paddingBottom: 6,
+          backgroundColor: colors.background,
+          borderTopWidth: 0.5,
+          borderTopColor: colors.separator,
+          height: 50,
+          paddingBottom: 0,
+          elevation: 0,
         },
-        tabBarActiveTintColor: colors.gold,
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: colors.foreground,
         tabBarInactiveTintColor: colors.muted,
-        tabBarLabelStyle: { fontSize: 10, fontWeight: "600" },
       }}
     >
       <Tabs.Screen
         name="(search)"
-        options={{
-          title: "Zoeken",
-          tabBarIcon: ({ color, size }) => <Search size={size} color={color} />,
-        }}
+        options={{ tabBarIcon: ({ color }) => <Search size={24} color={color} /> }}
       />
       <Tabs.Screen
         name="(bookings)"
-        options={{
-          title: "Afspraken",
-          tabBarIcon: ({ color, size }) => <CalendarDays size={size} color={color} />,
-        }}
+        options={{ tabBarIcon: ({ color }) => <CalendarDays size={24} color={color} /> }}
       />
       <Tabs.Screen
         name="(favorites)"
-        options={{
-          title: "Favorieten",
-          tabBarIcon: ({ color, size }) => <Heart size={size} color={color} />,
-        }}
+        options={{ tabBarIcon: ({ color }) => <Heart size={24} color={color} /> }}
       />
       <Tabs.Screen
         name="(profile)"
-        options={{
-          title: "Profiel",
-          tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
-        }}
+        options={{ tabBarIcon: ({ color }) => <User size={24} color={color} /> }}
       />
     </Tabs>
   );

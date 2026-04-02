@@ -67,7 +67,7 @@ export default function SettingsScreen() {
                   <Switch
                     value={!h.closed}
                     onValueChange={() => toggleDay(h.dayOfWeek, h.closed)}
-                    trackColor={{ false: colors.surfaceLight, true: "rgba(212, 168, 83, 0.3)" }}
+                    trackColor={{ false: colors.surfaceRaised, true: "rgba(212, 168, 83, 0.3)" }}
                     thumbColor={h.closed ? colors.muted : colors.gold}
                   />
                 </View>
@@ -97,11 +97,11 @@ const styles = StyleSheet.create({
   section: { paddingHorizontal: 20, marginTop: 16 },
   sectionHeader: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 12 },
   sectionTitle: { fontSize: 16, fontWeight: "700", color: colors.foreground },
-  hoursList: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 14, overflow: "hidden" },
+  hoursList: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator, borderRadius: 14, overflow: "hidden" },
   hourRow: {
     flexDirection: "row", justifyContent: "space-between", alignItems: "center",
     paddingHorizontal: 16, paddingVertical: 12,
-    borderBottomWidth: 1, borderBottomColor: colors.border,
+    borderBottomWidth: 1, borderBottomColor: colors.separator,
   },
   dayName: { fontSize: 14, color: colors.muted, width: 100 },
   dayNameOpen: { color: colors.foreground, fontWeight: "500" },
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   closedText: { fontSize: 13, color: colors.muted },
   timeText: { fontSize: 13, color: colors.gold, fontWeight: "500", fontVariant: ["tabular-nums"] },
   infoCard: {
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
     borderRadius: 14, padding: 20, alignItems: "center",
   },
   infoText: { fontSize: 13, color: colors.muted, textAlign: "center" },

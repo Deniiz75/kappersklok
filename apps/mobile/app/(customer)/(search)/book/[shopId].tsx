@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 16, fontWeight: "600", color: colors.foreground, marginLeft: 8 },
   progress: { flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 24, paddingBottom: 16 },
   progressItem: { alignItems: "center", gap: 4 },
-  dot: { width: 24, height: 24, borderRadius: 12, backgroundColor: colors.surfaceLight, justifyContent: "center", alignItems: "center" },
+  dot: { width: 24, height: 24, borderRadius: 12, backgroundColor: colors.surfaceRaised, justifyContent: "center", alignItems: "center" },
   dotDone: { backgroundColor: colors.gold },
   dotActive: { backgroundColor: "rgba(212, 168, 83, 0.2)" },
   dotText: { fontSize: 10, fontWeight: "700", color: colors.muted },
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   // Service cards
   optionCard: {
     flexDirection: "row", justifyContent: "space-between", alignItems: "center",
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
     borderRadius: 14, padding: 16, marginBottom: 10,
   },
   optionName: { fontSize: 15, fontWeight: "600", color: colors.foreground },
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
   barberGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
   barberCard: {
     width: "47%" as unknown as number, alignItems: "center", gap: 8,
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
     borderRadius: 14, padding: 20,
   },
   barberAvatar: {
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   dateScroll: { marginBottom: 4 },
   dateRow: { flexDirection: "row", gap: 8 },
   dateChip: {
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
     borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10,
   },
   dateChipActive: { borderColor: colors.gold, backgroundColor: "rgba(212, 168, 83, 0.1)" },
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
   dateChipTextActive: { color: colors.gold, fontWeight: "600" },
   timeGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   timeChip: {
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
     borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8,
   },
   timeChipActive: { borderColor: colors.gold, backgroundColor: "rgba(212, 168, 83, 0.1)" },
@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
   summaryLabel: { color: colors.muted },
   // Form
   input: {
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
     borderRadius: 12, padding: 14, fontSize: 15, color: colors.foreground, marginBottom: 10,
   },
   goldButton: {

@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 28, fontWeight: "700", color: colors.foreground },
   dateScroll: { paddingVertical: 8 },
   dateChip: {
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
     borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10,
   },
   dateChipActive: { borderColor: colors.gold, backgroundColor: "rgba(212, 168, 83, 0.1)" },
@@ -135,14 +135,14 @@ const styles = StyleSheet.create({
   emptyText: { fontSize: 14, color: colors.muted },
   card: {
     flexDirection: "row", backgroundColor: colors.surface,
-    borderWidth: 1, borderColor: colors.border, borderRadius: 12, overflow: "hidden",
+    borderWidth: 1, borderColor: colors.separator, borderRadius: 12, overflow: "hidden",
   },
   timeSidebar: {
     width: 50, alignItems: "center", justifyContent: "center",
-    paddingVertical: 12, borderRightWidth: 1, borderRightColor: colors.border,
+    paddingVertical: 12, borderRightWidth: 1, borderRightColor: colors.separator,
   },
   timeText: { fontSize: 13, fontWeight: "700", color: colors.gold, fontVariant: ["tabular-nums"] },
-  timeLine: { width: 1, height: 8, backgroundColor: colors.border, marginVertical: 2 },
+  timeLine: { width: 1, height: 8, backgroundColor: colors.separator, marginVertical: 2 },
   timeEndText: { fontSize: 11, color: colors.muted, fontVariant: ["tabular-nums"] },
   cardContent: { flex: 1, padding: 12, gap: 2 },
   customerName: { fontSize: 14, fontWeight: "600", color: colors.foreground },

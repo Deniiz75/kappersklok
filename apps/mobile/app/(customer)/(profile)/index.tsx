@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   actions: { width: "100%", marginTop: 40, gap: 12 },
   actionButton: {
     flexDirection: "row", alignItems: "center", gap: 12,
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
     borderRadius: 12, padding: 16,
   },
   actionText: { fontSize: 15, color: colors.foreground, fontWeight: "500" },

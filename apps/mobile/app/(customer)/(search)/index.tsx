@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl } from "react-native";
+import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Search, MapPin, Users, ChevronRight } from "lucide-react-native";
+import { Search, MapPin, Star } from "lucide-react-native";
 import { useShops } from "../../../lib/hooks";
 import { colors } from "../../../lib/theme";
 
@@ -17,104 +17,121 @@ export default function SearchScreen() {
     setRefreshing(false);
   }, [refetch]);
 
-  const filtered = query
-    ? (shops || []).filter(
-        (s) =>
-          s.name.toLowerCase().includes(query.toLowerCase()) ||
-          s.city?.toLowerCase().includes(query.toLowerCase()),
-      )
-    : shops || [];
+  const allShops = (shops || []) as Array<{
+    id: string; name: string; slug: string; city: string | null;
+    barbers: { id: string; name: string }[];
+  }>;
 
-  const cities = [...new Set((shops || []).map((s: Record<string, unknown>) => s.city as string).filter(Boolean))].sort();
+  const filtered = query
+    ? allShops.filter((s) =>
+        s.name.toLowerCase().includes(query.toLowerCase()) ||
+        s.city?.toLowerCase().includes(query.toLowerCase()))
+    : allShops;
+
+  function getInitials(name: string) {
+    return name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Kapper zoeken</Text>
-        <Text style={styles.subtitle}>
-          {isLoading ? "Laden..." : `${filtered.length} kappers`}
-        </Text>
+        <Text style={styles.headerTitle}>Ontdekken</Text>
       </View>
 
-      {/* Search */}
+      {/* Search bar — Instagram-style */}
       <View style={styles.searchWrap}>
-        <Search size={18} color={colors.muted} />
+        <Search size={16} color={colors.muted} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Zoek op naam of stad..."
+          placeholder="Zoeken"
           placeholderTextColor={colors.muted}
           value={query}
           onChangeText={setQuery}
         />
       </View>
 
-      {/* City chips */}
-      {!query && cities.length > 0 && (
-        <View style={styles.chips}>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={cities}
-            keyExtractor={(c) => c}
-            contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}
-            renderItem={({ item: city }) => (
-              <TouchableOpacity
-                style={styles.chip}
-                onPress={() => setQuery(city)}
-              >
-                <Text style={styles.chipText}>{city}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-      )}
-
-      {/* Shop list */}
       {isLoading ? (
         <View style={styles.loading}>
-          <ActivityIndicator size="large" color={colors.gold} />
+          <ActivityIndicator size="small" color={colors.muted} />
         </View>
       ) : (
         <FlatList
           data={filtered}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ padding: 16, gap: 12 }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.gold} />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.muted} />}
+          ListHeaderComponent={
+            !query && allShops.length > 0 ? (
+              <>
+                {/* Stories-row: featured barbers */}
+                <FlatList
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  data={allShops.slice(0, 10)}
+                  keyExtractor={(item) => item.id}
+                  contentContainerStyle={styles.storiesRow}
+                  renderItem={({ item: shop }) => (
+                    <TouchableOpacity
+                      style={styles.storyItem}
+                      onPress={() => router.push(`/(customer)/(search)/shop/${shop.slug}`)}
+                      activeOpacity={0.7}
+                    >
+                      <View style={styles.storyRing}>
+                        <View style={styles.storyAvatar}>
+                          <Text style={styles.storyInitials}>{getInitials(shop.name)}</Text>
+                        </View>
+                      </View>
+                      <Text style={styles.storyName} numberOfLines={1}>{shop.name.split(" ")[0]}</Text>
+                    </TouchableOpacity>
+                  )}
+                />
+                <View style={styles.separator} />
+              </>
+            ) : null
+          }
           renderItem={({ item: shop }) => (
             <TouchableOpacity
-              style={styles.card}
+              style={styles.shopCard}
               onPress={() => router.push(`/(customer)/(search)/shop/${shop.slug}`)}
-              activeOpacity={0.7}
+              activeOpacity={0.8}
             >
-              {/* Monogram */}
-              <View style={styles.monogram}>
-                <Text style={styles.monogramText}>
-                  {shop.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()}
-                </Text>
-              </View>
-
-              <View style={styles.cardContent}>
-                <Text style={styles.shopName}>{shop.name}</Text>
-                {shop.city && (
-                  <View style={styles.infoRow}>
-                    <MapPin size={12} color={colors.muted} />
-                    <Text style={styles.infoText}>{shop.city}</Text>
-                  </View>
-                )}
-                <View style={styles.infoRow}>
-                  <Users size={12} color={colors.muted} />
-                  <Text style={styles.infoText}>{shop.barbers?.length || 0} kappers</Text>
+              {/* Shop header — Instagram post style */}
+              <View style={styles.shopHeader}>
+                <View style={styles.shopAvatar}>
+                  <Text style={styles.shopInitials}>{getInitials(shop.name)}</Text>
+                </View>
+                <View style={styles.shopInfo}>
+                  <Text style={styles.shopName}>{shop.name}</Text>
+                  {shop.city && (
+                    <Text style={styles.shopLocation}>{shop.city}</Text>
+                  )}
                 </View>
               </View>
 
-              <ChevronRight size={18} color={colors.muted} />
+              {/* Shop "image" area — gradient placeholder */}
+              <View style={styles.shopBanner}>
+                <Text style={styles.bannerInitials}>{getInitials(shop.name)}</Text>
+                <View style={styles.bannerOverlay}>
+                  <Text style={styles.bannerText}>{shop.barbers?.length || 0} kappers beschikbaar</Text>
+                </View>
+              </View>
+
+              {/* Actions row */}
+              <View style={styles.shopActions}>
+                <View style={styles.shopActionLeft}>
+                  <Star size={20} color={colors.foreground} />
+                  <MapPin size={20} color={colors.foreground} />
+                </View>
+                <TouchableOpacity style={styles.bookBtn}>
+                  <Text style={styles.bookBtnText}>Boek nu</Text>
+                </TouchableOpacity>
+              </View>
             </TouchableOpacity>
           )}
           ListEmptyComponent={
             <View style={styles.empty}>
               <Text style={styles.emptyText}>
-                {query ? `Geen kappers gevonden voor "${query}"` : "Geen kappers beschikbaar"}
+                {query ? `Geen resultaten voor "${query}"` : "Geen kappers beschikbaar"}
               </Text>
             </View>
           }
@@ -126,38 +143,70 @@ export default function SearchScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  header: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 8 },
-  title: { fontSize: 28, fontWeight: "700", color: colors.foreground },
-  subtitle: { fontSize: 14, color: colors.muted, marginTop: 2 },
+  header: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 8 },
+  headerTitle: { fontSize: 24, fontWeight: "700", color: colors.foreground },
   searchWrap: {
-    flexDirection: "row", alignItems: "center", gap: 10,
-    marginHorizontal: 16, marginVertical: 8,
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
-    borderRadius: 12, paddingHorizontal: 14, height: 46,
+    flexDirection: "row", alignItems: "center", gap: 8,
+    marginHorizontal: 16, marginBottom: 12,
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: 10, paddingHorizontal: 12, height: 36,
   },
-  searchInput: { flex: 1, fontSize: 15, color: colors.foreground },
-  chips: { marginBottom: 4 },
-  chip: {
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
-    borderRadius: 20, paddingHorizontal: 14, paddingVertical: 6,
+  searchInput: { flex: 1, fontSize: 14, color: colors.foreground },
+  loading: { flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 40 },
+  // Stories row
+  storiesRow: { paddingHorizontal: 12, paddingVertical: 12, gap: 16 },
+  storyItem: { alignItems: "center", width: 68 },
+  storyRing: {
+    width: 68, height: 68, borderRadius: 34,
+    borderWidth: 2, borderColor: colors.gold,
+    justifyContent: "center", alignItems: "center",
+    padding: 2,
   },
-  chipText: { fontSize: 12, color: colors.mutedForeground, fontWeight: "500" },
-  loading: { flex: 1, justifyContent: "center", alignItems: "center" },
-  card: {
-    flexDirection: "row", alignItems: "center", gap: 14,
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
-    borderRadius: 14, padding: 16,
-  },
-  monogram: {
-    width: 48, height: 48, borderRadius: 24,
-    backgroundColor: "rgba(212, 168, 83, 0.1)",
+  storyAvatar: {
+    width: 60, height: 60, borderRadius: 30,
+    backgroundColor: colors.surface,
     justifyContent: "center", alignItems: "center",
   },
-  monogramText: { fontSize: 16, fontWeight: "700", color: colors.gold },
-  cardContent: { flex: 1 },
-  shopName: { fontSize: 15, fontWeight: "600", color: colors.foreground },
-  infoRow: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 3 },
-  infoText: { fontSize: 12, color: colors.muted },
+  storyInitials: { fontSize: 18, fontWeight: "700", color: colors.gold },
+  storyName: { fontSize: 11, color: colors.foreground, marginTop: 4, textAlign: "center" },
+  separator: { height: 0.5, backgroundColor: colors.separator },
+  // Shop cards — Instagram post style
+  shopCard: { marginBottom: 8 },
+  shopHeader: {
+    flexDirection: "row", alignItems: "center", gap: 10,
+    paddingHorizontal: 14, paddingVertical: 10,
+  },
+  shopAvatar: {
+    width: 34, height: 34, borderRadius: 17,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
+    justifyContent: "center", alignItems: "center",
+  },
+  shopInitials: { fontSize: 12, fontWeight: "700", color: colors.gold },
+  shopInfo: { flex: 1 },
+  shopName: { fontSize: 13, fontWeight: "600", color: colors.foreground },
+  shopLocation: { fontSize: 11, color: colors.muted },
+  shopBanner: {
+    height: 200, backgroundColor: colors.surface,
+    justifyContent: "center", alignItems: "center",
+    position: "relative",
+  },
+  bannerInitials: { fontSize: 56, fontWeight: "800", color: colors.surfaceRaised, opacity: 0.5 },
+  bannerOverlay: {
+    position: "absolute", bottom: 0, left: 0, right: 0,
+    paddingHorizontal: 14, paddingVertical: 10,
+    backgroundColor: "rgba(0,0,0,0.4)",
+  },
+  bannerText: { fontSize: 13, color: colors.foreground, fontWeight: "500" },
+  shopActions: {
+    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
+    paddingHorizontal: 14, paddingVertical: 10,
+  },
+  shopActionLeft: { flexDirection: "row", gap: 16 },
+  bookBtn: {
+    backgroundColor: colors.gold, borderRadius: 8,
+    paddingHorizontal: 20, paddingVertical: 7,
+  },
+  bookBtnText: { fontSize: 13, fontWeight: "700", color: colors.background },
   empty: { padding: 40, alignItems: "center" },
-  emptyText: { fontSize: 14, color: colors.muted, textAlign: "center" },
+  emptyText: { fontSize: 14, color: colors.muted },
 });

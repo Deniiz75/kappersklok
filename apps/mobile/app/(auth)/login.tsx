@@ -29,11 +29,7 @@ export default function LoginScreen() {
     setError("");
     if (!otpSent) {
       const { error } = await signInWithOtp(email);
-      if (error) {
-        setError(error);
-      } else {
-        setOtpSent(true);
-      }
+      if (error) { setError(error); } else { setOtpSent(true); }
     } else {
       const { error } = await verifyOtp(email, otpCode);
       if (error) setError(error);
@@ -45,12 +41,11 @@ export default function LoginScreen() {
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.inner}>
         {/* Logo */}
-        <View style={styles.logoContainer}>
-          <Text style={styles.logoKappers}>KAPPERS</Text>
-          <Text style={styles.logoKlok}>KLOK</Text>
+        <View style={styles.logoWrap}>
+          <Text style={styles.logo}>Kappersklok</Text>
         </View>
 
-        {/* Tabs */}
+        {/* Tabs — Instagram-style underline tabs */}
         <View style={styles.tabs}>
           <TouchableOpacity
             style={[styles.tab, tab === "klant" && styles.tabActive]}
@@ -68,37 +63,39 @@ export default function LoginScreen() {
 
         {/* Form */}
         <View style={styles.form}>
-          <TextInput
-            style={styles.input}
-            placeholder="E-mailadres"
-            placeholderTextColor={colors.muted}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-
-          {tab === "kapper" && (
+          <View style={styles.inputGroup}>
             <TextInput
               style={styles.input}
-              placeholder="Wachtwoord"
+              placeholder="E-mailadres"
               placeholderTextColor={colors.muted}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
-          )}
 
-          {tab === "klant" && otpSent && (
-            <TextInput
-              style={styles.input}
-              placeholder="Verificatiecode"
-              placeholderTextColor={colors.muted}
-              value={otpCode}
-              onChangeText={setOtpCode}
-              keyboardType="number-pad"
-            />
-          )}
+            {tab === "kapper" && (
+              <TextInput
+                style={[styles.input, styles.inputLast]}
+                placeholder="Wachtwoord"
+                placeholderTextColor={colors.muted}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
+            )}
+
+            {tab === "klant" && otpSent && (
+              <TextInput
+                style={[styles.input, styles.inputLast]}
+                placeholder="Verificatiecode"
+                placeholderTextColor={colors.muted}
+                value={otpCode}
+                onChangeText={setOtpCode}
+                keyboardType="number-pad"
+              />
+            )}
+          </View>
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -106,23 +103,25 @@ export default function LoginScreen() {
             style={[styles.button, loading && styles.buttonDisabled]}
             onPress={tab === "kapper" ? handleBarberLogin : handleCustomerOtp}
             disabled={loading}
+            activeOpacity={0.7}
           >
             <Text style={styles.buttonText}>
-              {loading
-                ? "Laden..."
-                : tab === "kapper"
-                  ? "Inloggen"
-                  : otpSent
-                    ? "Verifiëren"
-                    : "Stuur verificatiecode"}
+              {loading ? "Laden..." : tab === "kapper" ? "Inloggen" : otpSent ? "Verifiëren" : "Stuur code"}
             </Text>
           </TouchableOpacity>
 
           {tab === "klant" && !otpSent && (
             <Text style={styles.hint}>
-              We sturen een code naar uw e-mailadres om in te loggen.
+              We sturen een verificatiecode naar je e-mail.
             </Text>
           )}
+        </View>
+
+        {/* Footer */}
+        <View style={styles.footer}>
+          <View style={styles.footerLine} />
+          <Text style={styles.footerText}>Kappersklok</Text>
+          <View style={styles.footerLine} />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -131,34 +130,42 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  inner: { flex: 1, justifyContent: "center", paddingHorizontal: 32 },
-  logoContainer: { flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 48, gap: 8 },
-  logoKappers: { fontSize: 22, fontWeight: "300", color: "#b0b0b0", letterSpacing: 3 },
-  logoKlok: { fontSize: 22, fontWeight: "700", color: colors.gold, letterSpacing: 1.5 },
-  tabs: { flexDirection: "row", marginBottom: 24, backgroundColor: colors.surface, borderRadius: 12, padding: 4 },
-  tab: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: "center" },
-  tabActive: { backgroundColor: colors.gold },
-  tabText: { fontSize: 14, fontWeight: "600", color: colors.muted },
-  tabTextActive: { color: colors.background },
-  form: { gap: 12 },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    padding: 14,
-    fontSize: 15,
-    color: colors.foreground,
+  inner: { flex: 1, justifyContent: "center", paddingHorizontal: 40 },
+  logoWrap: { alignItems: "center", marginBottom: 40 },
+  logo: {
+    fontSize: 36, fontWeight: "400", color: colors.foreground,
+    fontStyle: "italic", letterSpacing: -0.5,
   },
+  tabs: { flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: colors.separator, marginBottom: 24 },
+  tab: { flex: 1, alignItems: "center", paddingBottom: 12, borderBottomWidth: 1.5, borderBottomColor: "transparent" },
+  tabActive: { borderBottomColor: colors.foreground },
+  tabText: { fontSize: 14, fontWeight: "600", color: colors.muted },
+  tabTextActive: { color: colors.foreground },
+  form: { gap: 14 },
+  inputGroup: {
+    backgroundColor: colors.surface,
+    borderRadius: 8,
+    borderWidth: 0.5,
+    borderColor: colors.separator,
+    overflow: "hidden",
+  },
+  input: {
+    paddingHorizontal: 16, paddingVertical: 14,
+    fontSize: 14, color: colors.foreground,
+    borderBottomWidth: 0.5, borderBottomColor: colors.separator,
+  },
+  inputLast: { borderBottomWidth: 0 },
   error: { color: colors.destructive, fontSize: 13, textAlign: "center" },
   button: {
     backgroundColor: colors.gold,
-    borderRadius: 12,
+    borderRadius: 8,
     paddingVertical: 14,
     alignItems: "center",
-    marginTop: 4,
   },
-  buttonDisabled: { opacity: 0.6 },
-  buttonText: { color: colors.background, fontSize: 15, fontWeight: "700" },
-  hint: { color: colors.muted, fontSize: 12, textAlign: "center", marginTop: 8 },
+  buttonDisabled: { opacity: 0.4 },
+  buttonText: { color: colors.background, fontSize: 14, fontWeight: "700" },
+  hint: { color: colors.muted, fontSize: 12, textAlign: "center" },
+  footer: { flexDirection: "row", alignItems: "center", marginTop: 60, gap: 16 },
+  footerLine: { flex: 1, height: 0.5, backgroundColor: colors.separator },
+  footerText: { fontSize: 12, color: colors.muted, fontWeight: "500" },
 });

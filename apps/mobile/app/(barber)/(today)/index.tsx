@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   headerActions: { flexDirection: "row", gap: 16 },
   stats: { flexDirection: "row", gap: 10, paddingHorizontal: 20, paddingVertical: 16 },
   statCard: {
-    flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
     borderRadius: 12, padding: 12, alignItems: "center",
   },
   statNumber: { fontSize: 20, fontWeight: "700", color: colors.gold },
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   empty: { flex: 1, justifyContent: "center", alignItems: "center", gap: 8 },
   emptyText: { fontSize: 14, color: colors.muted },
   card: {
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
     borderRadius: 14, padding: 16,
   },
   cardHeader: { flexDirection: "row", justifyContent: "space-between" },
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   cardService: { fontSize: 13, color: colors.foreground, fontWeight: "500" },
   cardPrice: { fontSize: 13, color: colors.gold, fontWeight: "600", marginTop: 1 },
   cardBarber: { fontSize: 12, color: colors.muted, marginTop: 6 },
-  cardActions: { flexDirection: "row", gap: 8, marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.border },
+  cardActions: { flexDirection: "row", gap: 8, marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.separator },
   actionDone: {
     flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4,
     backgroundColor: "rgba(109, 184, 123, 0.1)", borderRadius: 8, paddingVertical: 8,
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   actionDoneText: { fontSize: 12, fontWeight: "600", color: colors.success },
   actionNoShow: {
     flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4,
-    backgroundColor: colors.surfaceLight, borderRadius: 8, paddingVertical: 8,
+    backgroundColor: colors.surfaceRaised, borderRadius: 8, paddingVertical: 8,
   },
   actionNoShowText: { fontSize: 12, fontWeight: "600", color: colors.muted },
   actionCancel: {

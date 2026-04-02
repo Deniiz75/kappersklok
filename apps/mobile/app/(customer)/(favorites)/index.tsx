@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   goldButtonText: { fontSize: 13, fontWeight: "700", color: colors.background },
   card: {
     flexDirection: "row", alignItems: "center", gap: 12,
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
     borderRadius: 14, padding: 14,
   },
   monogram: {

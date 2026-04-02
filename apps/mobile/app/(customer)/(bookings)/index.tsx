@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 14, color: colors.muted, marginTop: 2 },
   stats: { flexDirection: "row", gap: 10, paddingHorizontal: 20, paddingVertical: 16 },
   statCard: {
-    flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
     borderRadius: 12, padding: 12, alignItems: "center",
   },
   statNumber: { fontSize: 20, fontWeight: "700", color: colors.gold },
@@ -236,12 +236,12 @@ const styles = StyleSheet.create({
   // Appointment cards
   appointmentCard: {
     flexDirection: "row", backgroundColor: colors.surface,
-    borderWidth: 1, borderColor: colors.border, borderRadius: 14,
+    borderWidth: 1, borderColor: colors.separator, borderRadius: 14,
     overflow: "hidden", marginBottom: 10,
   },
   waitlistCard: {
     flexDirection: "row", backgroundColor: colors.surface,
-    borderWidth: 1, borderColor: colors.border, borderRadius: 14,
+    borderWidth: 1, borderColor: colors.separator, borderRadius: 14,
     overflow: "hidden", marginBottom: 10,
   },
   sidebar: { width: 60, alignItems: "center", justifyContent: "center", paddingVertical: 12 },
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
   cancelLink: { fontSize: 10, color: colors.muted },
   // Empty
   emptyCard: {
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
     borderRadius: 14, padding: 32, alignItems: "center", gap: 8,
   },
   emptyText: { fontSize: 14, color: colors.muted },

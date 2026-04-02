@@ -1,19 +1,25 @@
 export const colors = {
+  // Instagram-inspired dark theme with gold accent
   gold: "#d4a853",
-  goldHover: "#e8c068",
-  background: "#0a0a0f",
-  surface: "#111113",
-  surfaceLight: "#1a1a1e",
-  border: "#1e1e22",
-  foreground: "#f5f5f5",
-  muted: "#666",
-  mutedForeground: "#999",
-  destructive: "#c94a6d",
-  success: "#6db87b",
+  goldLight: "rgba(212, 168, 83, 0.12)",
+  goldBorder: "rgba(212, 168, 83, 0.25)",
+  background: "#000000",
+  surface: "#121212",
+  surfaceRaised: "#1c1c1e",
+  separator: "#2c2c2e",
+  foreground: "#ffffff",
+  secondary: "#e0e0e0",
+  muted: "#8e8e93",
+  mutedForeground: "#aeaeb2",
+  destructive: "#ff453a",
+  success: "#30d158",
+  link: "#0a84ff",
 };
 
-export const fonts = {
-  regular: "System",
-  semibold: "System",
-  bold: "System",
+export const spacing = {
+  xs: 4,
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
 };

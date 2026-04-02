@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 14, color: colors.muted, marginTop: 4 },
   card: {
     width: "100%", marginTop: 28,
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
     borderRadius: 16, padding: 20, gap: 14,
   },
   detailRow: { flexDirection: "row", alignItems: "center", gap: 10 },
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   },
   goldButtonText: { fontSize: 15, fontWeight: "700", color: colors.background },
   outlineButton: {
-    borderWidth: 1, borderColor: colors.border, borderRadius: 12,
+    borderWidth: 1, borderColor: colors.separator, borderRadius: 12,
     paddingVertical: 14, alignItems: "center",
   },
   outlineButtonText: { fontSize: 14, color: colors.muted, fontWeight: "500" },
