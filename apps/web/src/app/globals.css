@@ -356,3 +356,58 @@
   animation: tick 60s linear infinite;
   transform-origin: bottom center;
 }
+
+/* ── Testimonial slider ── */
+@keyframes slide-testimonial {
+  0%, 18% { opacity: 1; transform: translateX(0); }
+  20%, 38% { opacity: 0; transform: translateX(-20px); }
+  40%, 58% { opacity: 0; transform: translateX(20px); }
+  60%, 78% { opacity: 0; transform: translateX(20px); }
+  80%, 98% { opacity: 0; transform: translateX(20px); }
+  100% { opacity: 0; }
+}
+
+.testimonial-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.testimonial-slide.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ── Phone mockup ── */
+.phone-mockup {
+  position: relative;
+  width: 220px;
+  height: 440px;
+  background: #1a1a1a;
+  border-radius: 36px;
+  border: 3px solid #333;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.05);
+  overflow: hidden;
+}
+
+.phone-mockup::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 6px;
+  background: #333;
+  border-radius: 3px;
+  z-index: 10;
+}
+
+.phone-mockup-screen {
+  position: absolute;
+  inset: 8px;
+  border-radius: 28px;
+  overflow: hidden;
+  background: #000;
+}

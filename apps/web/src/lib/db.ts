@@ -50,10 +50,23 @@ export async function getActiveShopsWithBarbers() {
     .select("id, name, shopId, active")
     .eq("active", true);
 
-  return (shops || []).map((shop) => ({
-    ...shop,
-    barbers: (barbers || []).filter((b) => b.shopId === shop.id),
-  }));
+  const { data: reviews } = await supabase
+    .from("Review")
+    .select("shopId, rating")
+    .eq("approved", true);
+
+  return (shops || []).map((shop) => {
+    const shopReviews = (reviews || []).filter((r) => r.shopId === shop.id);
+    const avgRating = shopReviews.length > 0
+      ? shopReviews.reduce((sum, r) => sum + r.rating, 0) / shopReviews.length
+      : 0;
+    return {
+      ...shop,
+      barbers: (barbers || []).filter((b) => b.shopId === shop.id),
+      reviewCount: shopReviews.length,
+      avgRating,
+    };
+  });
 }
 
 export async function getShopBySlug(slug: string) {

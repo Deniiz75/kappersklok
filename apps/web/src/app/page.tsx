@@ -29,6 +29,7 @@ import { ShopMonogram } from "@/components/shop-monogram";
 import { getActiveShopsWithBarbers } from "@/lib/db";
 import { OrganizationSchema } from "@/components/json-ld";
 import { FadeIn, StaggerContainer, StaggerItem, ScaleIn } from "@/components/motion";
+import { TestimonialSlider } from "@/components/testimonial-slider";
 
 export const dynamic = "force-dynamic";
 
@@ -153,29 +154,10 @@ export default async function Home() {
             </div>
           </FadeIn>
 
-          {/* Testimonial */}
+          {/* Testimonial Slider */}
           <FadeIn delay={0.6}>
             <div className="mx-auto mt-10 max-w-xl">
-              <div className="rounded-xl border border-border/50 bg-surface/50 backdrop-blur-sm p-6">
-                <Quote className="h-5 w-5 text-gold/40 mb-3" />
-                <p className="text-sm text-muted-foreground italic">
-                  &ldquo;{testimonials[0].text}&rdquo;
-                </p>
-                <div className="mt-4 flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold/10 animate-pulse-gold">
-                    <span className="text-xs font-bold text-gold">{testimonials[0].name[0]}</span>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold">{testimonials[0].name}</p>
-                    <p className="text-xs text-muted-foreground">{testimonials[0].shop}</p>
-                  </div>
-                  <div className="ml-auto flex gap-0.5">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} className="h-3 w-3 fill-gold text-gold" />
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <TestimonialSlider testimonials={testimonials} />
             </div>
           </FadeIn>
         </div>
@@ -251,10 +233,17 @@ export default async function Home() {
                     </span>
                   </div>
                   <div className="mt-3 flex items-center justify-between">
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: 5 }).map((_, j) => (
-                        <Star key={j} className="h-3 w-3 fill-gold/60 text-gold/60" />
-                      ))}
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-0.5">
+                        {Array.from({ length: 5 }).map((_, j) => (
+                          <Star key={j} className={`h-3 w-3 ${j < Math.round(shop.avgRating || 0) ? "fill-gold text-gold" : "fill-gold/20 text-gold/20"}`} />
+                        ))}
+                      </div>
+                      {shop.reviewCount > 0 && (
+                        <span className="text-[10px] text-muted-foreground">
+                          ({shop.avgRating.toFixed(1)}) · {shop.reviewCount} beoordelingen
+                        </span>
+                      )}
                     </div>
                     <span className="text-xs font-medium text-gold group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
                       Bekijk <ChevronRight className="h-3 w-3" />
@@ -449,7 +438,48 @@ export default async function Home() {
                   </Button>
                 </div>
               </div>
-              <div className="flex h-56 w-56 items-center justify-center rounded-3xl bg-gold/5 border border-gold/20 glow-gold">
+              {/* Phone mockup */}
+              <div className="hidden md:block">
+                <div className="phone-mockup">
+                  <div className="phone-mockup-screen">
+                    {/* Mini app preview inside phone */}
+                    <div className="flex flex-col h-full bg-black p-4">
+                      <div className="text-center pt-6 pb-4">
+                        <div className="mx-auto h-12 w-12 rounded-full bg-gold/10 flex items-center justify-center mb-2">
+                          <Scissors className="h-5 w-5 text-gold" />
+                        </div>
+                        <p className="text-[10px] font-bold text-white tracking-wider">KAPPERSKLOK</p>
+                      </div>
+                      {/* Mini search bar */}
+                      <div className="rounded-lg bg-white/5 border border-white/10 px-3 py-2 mb-3">
+                        <p className="text-[8px] text-white/40">Zoek een kapper...</p>
+                      </div>
+                      {/* Mini shop cards */}
+                      <div className="space-y-2 flex-1">
+                        {["Barber Kings", "Chaci", "Ace Barbers"].map((name) => (
+                          <div key={name} className="rounded-lg bg-white/5 border border-white/10 p-2 flex items-center gap-2">
+                            <div className="h-7 w-7 rounded-full bg-gold/15 flex items-center justify-center shrink-0">
+                              <span className="text-[7px] font-bold text-gold">{name[0]}</span>
+                            </div>
+                            <div>
+                              <p className="text-[8px] font-semibold text-white">{name}</p>
+                              <p className="text-[6px] text-white/40">Open · 4.9 ★</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {/* Mini tab bar */}
+                      <div className="flex justify-around pt-3 border-t border-white/10 mt-2">
+                        {[Search, CalendarDays, Star, Users].map((Icon, i) => (
+                          <Icon key={i} className={`h-3.5 w-3.5 ${i === 0 ? "text-gold" : "text-white/30"}`} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* Mobile fallback */}
+              <div className="md:hidden flex h-56 w-56 items-center justify-center rounded-3xl bg-gold/5 border border-gold/20 glow-gold">
                 <Logo size={140} />
               </div>
             </div>
