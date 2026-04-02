@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {
   Search, CalendarDays, Scissors, Bell, RefreshCw, Monitor, Tablet, Globe,
-  ShieldCheck, Star, ArrowRight, MapPin, ChevronRight, Clock,
+  ShieldCheck, Star, ArrowRight, MapPin, ChevronRight,
   Smartphone, Users, CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,34 +57,28 @@ export default async function Home() {
     <>
       <OrganizationSchema />
 
-      {/* ══════════ DARK HERO SECTION ══════════ */}
-      <section className="relative overflow-hidden bg-[#1A1A1A] bg-grid-dark noise-overlay">
-        {/* Animated glow orbs */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -left-20 top-[10%] h-[300px] w-[300px] rounded-full bg-[#2ECC71]/[0.07] blur-[100px] animate-glow-drift-1 md:h-[400px] md:w-[400px]" />
-          <div className="absolute -right-20 bottom-[5%] h-[250px] w-[250px] rounded-full bg-[#B8923F]/[0.06] blur-[100px] animate-glow-drift-2 md:h-[350px] md:w-[350px]" />
+      {/* ══════════ DARK HERO SECTION — Neon Tech Dark ══════════ */}
+      <section className="relative overflow-hidden bg-[#0D0D0D] noise-overlay">
+        {/* Pulse rings — signature animatie */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="pulse-ring pulse-ring-1 h-[200px] w-[200px] md:h-[300px] md:w-[300px]" />
+          <div className="pulse-ring pulse-ring-2 h-[200px] w-[200px] md:h-[300px] md:w-[300px]" />
+          <div className="pulse-ring pulse-ring-3 h-[200px] w-[200px] md:h-[300px] md:w-[300px]" />
         </div>
 
-        {/* Radial gradient center glow */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(46,204,113,0.06)_0%,transparent_70%)]" />
-
-        {/* Floating barber icons */}
-        <div className="pointer-events-none absolute inset-0">
-          <Scissors className="absolute left-[8%] top-[18%] h-6 w-6 text-white/[0.08] animate-float-slow" />
-          <Clock className="absolute right-[10%] top-[22%] h-7 w-7 text-[#B8923F]/[0.10] animate-float-reverse" />
-          <Scissors className="absolute left-[15%] bottom-[20%] h-5 w-5 text-[#2ECC71]/[0.08] rotate-45 animate-float-reverse" />
-          <Clock className="absolute right-[18%] bottom-[25%] h-5 w-5 text-white/[0.06] animate-float-slow" />
-          <Scissors className="absolute left-[50%] top-[8%] h-4 w-4 text-white/[0.05] -rotate-12 animate-float-slow" />
-        </div>
+        {/* Subtle radial glow behind center content */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(46,204,113,0.04)_0%,transparent_60%)]" />
 
         <div className="relative mx-auto max-w-6xl px-4 pt-24 pb-16 md:pt-32 md:pb-20">
           <div className="text-center">
             <FadeIn>
-              <p className="text-white/50 text-sm tracking-widest uppercase mb-3">Welkom bij</p>
-              <h1 className="font-heading text-4xl font-bold tracking-tight text-gradient-gold md:text-6xl lg:text-7xl">
-                KAPPERSKLOK
-              </h1>
-              <div className="mx-auto mt-4 h-0.5 w-16 rounded-full bg-gradient-to-r from-transparent via-[#2ECC71] to-transparent" />
+              <p className="text-white/40 text-sm tracking-widest uppercase mb-3">Welkom bij</p>
+              <div className="neon-text-glow">
+                <h1 className="font-heading text-4xl font-bold tracking-tight text-gradient-gold md:text-6xl lg:text-7xl">
+                  KAPPERSKLOK
+                </h1>
+              </div>
+              <div className="mx-auto mt-4 w-20 neon-divider" />
             </FadeIn>
 
             <FadeIn delay={0.2}>
@@ -94,9 +88,25 @@ export default async function Home() {
             </FadeIn>
           </div>
 
-          {/* Testimonial slider */}
+          {/* Stats in hero */}
+          <FadeIn delay={0.3}>
+            <div className="mx-auto mt-10 max-w-3xl">
+              <div className="neon-divider mb-8" />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {stats.map((stat) => (
+                  <div key={stat.label} className="text-center">
+                    <stat.icon className="mx-auto h-5 w-5 text-[#2ECC71]/60 mb-2" />
+                    <p className="text-2xl font-bold text-white md:text-3xl">{stat.value}</p>
+                    <p className="text-[10px] text-white/40 mt-1 uppercase tracking-wider">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </FadeIn>
+
+          {/* Testimonial slider met neon styling */}
           <FadeIn delay={0.4}>
-            <div className="mx-auto mt-12 max-w-lg [--foreground:#fff] [--muted-foreground:#999] [--surface:rgba(255,255,255,0.06)] [--border:rgba(255,255,255,0.12)] [--gold:#B8923F]">
+            <div className="mx-auto mt-10 max-w-lg [--foreground:#fff] [--muted-foreground:rgba(255,255,255,0.5)] [--surface:rgba(255,255,255,0.03)] [--border:rgba(46,204,113,0.2)] [--gold:#B8923F]">
               <TestimonialSlider testimonials={testimonials} />
             </div>
           </FadeIn>

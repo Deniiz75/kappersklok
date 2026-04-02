@@ -29,13 +29,13 @@ export function SearchBar() {
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto mt-10 max-w-2xl">
-      <div className="flex rounded-xl border border-border bg-surface overflow-hidden shadow-lg shadow-black/20">
+      <div className="flex rounded-xl overflow-hidden neon-border neon-border-focus bg-white/[0.05] transition-all duration-300">
         {/* City dropdown */}
-        <div className="relative hidden sm:block border-r border-border">
+        <div className="relative hidden sm:block border-r border-white/10">
           <button
             type="button"
             onClick={() => setOpen(!open)}
-            className="flex items-center gap-2 h-12 px-4 text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
+            className="flex items-center gap-2 h-12 px-4 text-sm text-white/60 hover:text-white transition-colors whitespace-nowrap"
           >
             <MapPin className="h-4 w-4 text-gold" />
             <span className="max-w-[120px] truncate">{city}</span>
@@ -44,14 +44,14 @@ export function SearchBar() {
           {open && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-              <div className="absolute top-full left-0 z-20 mt-1 w-56 max-h-64 overflow-y-auto rounded-lg border border-border bg-surface shadow-xl shadow-black/30">
+              <div className="absolute top-full left-0 z-20 mt-1 w-56 max-h-64 overflow-y-auto rounded-lg border border-white/10 bg-[#141414] shadow-xl shadow-black/50">
                 {popularCities.map((c) => (
                   <button
                     key={c}
                     type="button"
                     onClick={() => { setCity(c); setOpen(false); }}
-                    className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-gold/10 hover:text-gold ${
-                      city === c ? "text-gold bg-gold/5 font-medium" : "text-muted-foreground"
+                    className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-[#2ECC71]/10 hover:text-[#2ECC71] ${
+                      city === c ? "text-[#2ECC71] bg-[#2ECC71]/5 font-medium" : "text-white/60"
                     }`}
                   >
                     {c}
@@ -67,7 +67,7 @@ export function SearchBar() {
           name="q"
           type="text"
           placeholder="Zoek een kapper of stad..."
-          className="flex-1 h-12 bg-transparent px-4 text-sm text-foreground placeholder:text-muted-foreground outline-none"
+          className="flex-1 h-12 bg-transparent px-4 text-sm text-white placeholder:text-white/40 outline-none"
         />
 
         {/* Search button */}
