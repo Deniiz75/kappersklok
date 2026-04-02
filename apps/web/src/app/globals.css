@@ -52,41 +52,41 @@
 }
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #f5f5f5;
-  --surface: #1a1a1a;
-  --gold: #d4a853;
-  --gold-hover: #e8c068;
-  --card: #1a1a1a;
-  --card-foreground: #f5f5f5;
-  --popover: #1a1a1a;
-  --popover-foreground: #f5f5f5;
-  --primary: #d4a853;
-  --primary-foreground: #0a0a0a;
-  --secondary: #2a2a2a;
-  --secondary-foreground: #f5f5f5;
-  --muted: #2a2a2a;
-  --muted-foreground: #a3a3a3;
-  --accent: #2a2a2a;
-  --accent-foreground: #f5f5f5;
-  --destructive: #ef4444;
-  --border: #2a2a2a;
-  --input: #2a2a2a;
-  --ring: #d4a853;
-  --chart-1: #d4a853;
-  --chart-2: #e8c068;
-  --chart-3: #a3a3a3;
-  --chart-4: #2a2a2a;
-  --chart-5: #1a1a1a;
+  --background: #FAFAF8;
+  --foreground: #1A1A1A;
+  --surface: #FFFFFF;
+  --gold: #B8923F;
+  --gold-hover: #A07D2F;
+  --card: #FFFFFF;
+  --card-foreground: #1A1A1A;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1A1A;
+  --primary: #B8923F;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F5F3EF;
+  --secondary-foreground: #1A1A1A;
+  --muted: #F0EDE8;
+  --muted-foreground: #6B6B6B;
+  --accent: #F5F3EF;
+  --accent-foreground: #1A1A1A;
+  --destructive: #DC2626;
+  --border: #E8E5E0;
+  --input: #E8E5E0;
+  --ring: #B8923F;
+  --chart-1: #B8923F;
+  --chart-2: #D4A853;
+  --chart-3: #6B6B6B;
+  --chart-4: #E8E5E0;
+  --chart-5: #F5F3EF;
   --radius: 0.75rem;
   --sidebar: #1a1a1a;
   --sidebar-foreground: #f5f5f5;
-  --sidebar-primary: #d4a853;
-  --sidebar-primary-foreground: #0a0a0a;
+  --sidebar-primary: #B8923F;
+  --sidebar-primary-foreground: #FFFFFF;
   --sidebar-accent: #2a2a2a;
   --sidebar-accent-foreground: #f5f5f5;
   --sidebar-border: #2a2a2a;
-  --sidebar-ring: #d4a853;
+  --sidebar-ring: #B8923F;
 }
 
 @layer base {
@@ -165,8 +165,8 @@
 }
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px -8px rgba(212, 168, 83, 0.08);
-  border-color: rgba(212, 168, 83, 0.3);
+  box-shadow: 0 12px 30px -8px rgba(184, 146, 63, 0.12);
+  border-color: rgba(184, 146, 63, 0.3);
 }
 
 .card-hover-subtle {
@@ -259,13 +259,13 @@
 /* ── Decorative background pattern ── */
 .bg-grid-pattern {
   background-image:
-    linear-gradient(rgba(212, 168, 83, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(212, 168, 83, 0.08) 1px, transparent 1px);
+    linear-gradient(rgba(184, 146, 63, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(184, 146, 63, 0.06) 1px, transparent 1px);
   background-size: 50px 50px;
 }
 
 .bg-dots-pattern {
-  background-image: radial-gradient(rgba(212, 168, 83, 0.15) 1.5px, transparent 1.5px);
+  background-image: radial-gradient(rgba(184, 146, 63, 0.1) 1.5px, transparent 1.5px);
   background-size: 20px 20px;
 }
 
@@ -274,8 +274,8 @@
     -45deg,
     transparent,
     transparent 30px,
-    rgba(212, 168, 83, 0.06) 30px,
-    rgba(212, 168, 83, 0.06) 31px
+    rgba(184, 146, 63, 0.04) 30px,
+    rgba(184, 146, 63, 0.04) 31px
   );
 }
 
@@ -309,16 +309,16 @@
 
 /* ── Glow effects ── */
 .glow-gold {
-  box-shadow: 0 0 50px rgba(212, 168, 83, 0.15), 0 0 100px rgba(212, 168, 83, 0.08);
+  box-shadow: 0 4px 30px rgba(184, 146, 63, 0.12), 0 0 60px rgba(184, 146, 63, 0.06);
 }
 
 .glow-gold-sm {
-  box-shadow: 0 0 30px rgba(212, 168, 83, 0.12);
+  box-shadow: 0 2px 20px rgba(184, 146, 63, 0.08);
 }
 
 /* ── Text gradient ── */
 .text-gradient-gold {
-  background: linear-gradient(135deg, #d4a853, #e8c068, #d4a853);
+  background: linear-gradient(135deg, #B8923F, #D4A853, #B8923F);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

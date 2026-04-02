@@ -30,8 +30,8 @@ export function Navbar() {
       <div
         className={`transition-all duration-500 ${
           scrolled
-            ? "mx-2 mt-2 rounded-2xl border border-white/[0.06] bg-black/60 backdrop-blur-2xl shadow-lg shadow-black/30"
-            : "border-b border-white/[0.04] bg-black/30 backdrop-blur-md"
+            ? "mx-2 mt-2 rounded-2xl border border-border bg-white/70 backdrop-blur-2xl shadow-lg shadow-black/5"
+            : "border-b border-border/50 bg-white/50 backdrop-blur-md"
         }`}
       >
         <div className={`mx-auto flex max-w-6xl items-center px-4 transition-all duration-500 ${
@@ -46,17 +46,17 @@ export function Navbar() {
               whileTap={{ scale: 0.9 }}
             >
               <span
-                className={`absolute left-0 block h-[1.5px] w-full bg-white/80 transition-all duration-400 ease-in-out ${
+                className={`absolute left-0 block h-[1.5px] w-full bg-foreground/80 transition-all duration-400 ease-in-out ${
                   open ? "top-[9px] rotate-45" : "top-0 rotate-0"
                 }`}
               />
               <span
-                className={`absolute left-0 top-[9px] block h-[1.5px] bg-white/80 transition-all duration-400 ease-in-out ${
+                className={`absolute left-0 top-[9px] block h-[1.5px] bg-foreground/80 transition-all duration-400 ease-in-out ${
                   open ? "w-0 opacity-0" : "w-5 opacity-100"
                 }`}
               />
               <span
-                className={`absolute left-0 block h-[1.5px] w-full bg-white/80 transition-all duration-400 ease-in-out ${
+                className={`absolute left-0 block h-[1.5px] w-full bg-foreground/80 transition-all duration-400 ease-in-out ${
                   open ? "top-[9px] -rotate-45" : "top-[18px] rotate-0"
                 }`}
               />
@@ -66,7 +66,7 @@ export function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="relative px-3 py-1.5 text-sm text-white/60 transition-all duration-200 hover:text-white rounded-lg hover:bg-white/[0.05]"
+                  className="relative px-3 py-1.5 text-sm text-foreground/60 transition-all duration-200 hover:text-foreground rounded-lg hover:bg-foreground/[0.05]"
                 >
                   {link.label}
                 </Link>
@@ -92,7 +92,7 @@ export function Navbar() {
           <div className="flex flex-1 items-center justify-end gap-3">
             <Link
               href="/login"
-              className="hidden text-sm text-white/60 transition-all duration-200 hover:text-white md:inline-flex"
+              className="hidden text-sm text-foreground/60 transition-all duration-200 hover:text-foreground md:inline-flex"
             >
               Inloggen
             </Link>
@@ -116,7 +116,7 @@ export function Navbar() {
             transition={{ duration: 0.25, ease: "easeInOut" }}
             className={`overflow-hidden ${
               scrolled ? "mx-2 rounded-b-2xl" : ""
-            } border-t border-white/[0.04] bg-black/80 backdrop-blur-2xl md:hidden`}
+            } border-t border-border bg-white/90 backdrop-blur-2xl md:hidden`}
           >
             <nav className="flex flex-col gap-1 px-4 pb-4 pt-3">
               {navLinks.map((link, i) => (
@@ -128,7 +128,7 @@ export function Navbar() {
                 >
                   <Link
                     href={link.href}
-                    className="block rounded-lg px-3 py-2.5 text-sm text-white/60 transition-colors hover:text-white hover:bg-white/[0.05]"
+                    className="block rounded-lg px-3 py-2.5 text-sm text-foreground/60 transition-colors hover:text-foreground hover:bg-foreground/[0.05]"
                     onClick={() => setOpen(false)}
                   >
                     {link.label}
@@ -142,7 +142,7 @@ export function Navbar() {
               >
                 <Link
                   href="/login"
-                  className="block rounded-lg px-3 py-2.5 text-sm text-white/60 transition-colors hover:text-white hover:bg-white/[0.05]"
+                  className="block rounded-lg px-3 py-2.5 text-sm text-foreground/60 transition-colors hover:text-foreground hover:bg-foreground/[0.05]"
                   onClick={() => setOpen(false)}
                 >
                   Inloggen

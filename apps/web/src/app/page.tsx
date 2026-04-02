@@ -76,8 +76,8 @@ export default async function Home() {
       <section className="relative overflow-hidden bg-grid-pattern">
         {/* Decorative floating elements */}
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-[10%] top-[15%] h-80 w-80 rounded-full bg-gold/10 blur-[120px]" />
-          <div className="absolute right-[5%] bottom-[10%] h-64 w-64 rounded-full bg-gold/8 blur-[100px]" />
+          <div className="absolute left-[10%] top-[15%] h-80 w-80 rounded-full bg-gold/8 blur-[120px]" />
+          <div className="absolute right-[5%] bottom-[10%] h-64 w-64 rounded-full bg-gold/6 blur-[100px]" />
           <div className="absolute right-[15%] top-[20%] animate-float-slow opacity-[0.08]">
             <Scissors className="h-32 w-32 text-gold" />
           </div>
