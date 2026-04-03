@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ShopMonogram } from "@/components/shop-monogram";
+import { AppGateOverlay } from "@/components/app-gate-overlay";
 import { Check, CalendarDays, User, Scissors, Clock, Bell } from "lucide-react";
 
 interface Service {
@@ -70,6 +71,16 @@ function timeToMinutes(time: string): number {
 export function BookingWizard({ shopId, shopName, services, barbers, businessHours }: BookingWizardProps) {
   const router = useRouter();
   const [step, setStep] = useState(0); // 0=closed, 1=service, 2=barber, 3=datetime, 4=details, 5=done
+  const [showAppGate, setShowAppGate] = useState(false);
+  const [appGateSettings, setAppGateSettings] = useState<Record<string, string>>({});
+
+  // Check app-gate status on mount
+  useEffect(() => {
+    fetch("/api/platform-settings")
+      .then((res) => res.json())
+      .then((data) => setAppGateSettings(data))
+      .catch(() => {});
+  }, []);
   const prevStep = useRef(0);
   const direction = step > prevStep.current ? 1 : -1;
 
@@ -195,15 +206,33 @@ export function BookingWizard({ shopId, shopName, services, barbers, businessHou
     }
   }
 
+  const appGateEnabled = appGateSettings.app_gate_enabled === "true";
+
   if (step === 0) {
     return (
-      <Button
-        onClick={() => goToStep(1)}
-        className="w-full bg-gold text-background hover:bg-gold-hover font-semibold"
-      >
-        <CalendarDays className="mr-2 h-4 w-4" />
-        Afspraak maken
-      </Button>
+      <>
+        <Button
+          onClick={() => {
+            if (appGateEnabled) {
+              setShowAppGate(true);
+            } else {
+              goToStep(1);
+            }
+          }}
+          className="w-full bg-foreground text-white hover:bg-foreground/90 font-semibold"
+        >
+          <CalendarDays className="mr-2 h-4 w-4" />
+          Afspraak maken
+        </Button>
+        {showAppGate && (
+          <AppGateOverlay
+            shopName={shopName}
+            appStoreUrl={appGateSettings.app_store_url || ""}
+            playStoreUrl={appGateSettings.play_store_url || ""}
+            onClose={() => setShowAppGate(false)}
+          />
+        )}
+      </>
     );
   }
 

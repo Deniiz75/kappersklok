@@ -234,3 +234,15 @@ model PushToken {
   @@unique([userEmail, expoPushToken])
   @@index([userEmail, userType])
 }
+
+model PlatformSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
+model AppNotifySubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}

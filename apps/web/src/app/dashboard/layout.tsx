@@ -10,6 +10,7 @@ import {
   CalendarDays,
   Scissors as ScissorsIcon,
   Settings,
+  Globe,
   MessageSquare,
   LogOut,
   LayoutDashboard,
@@ -41,6 +42,7 @@ const adminNav = [
   { href: "/dashboard/berichten", label: "Berichten", shortLabel: "Berichten", icon: MessageSquare, iconName: "MessageSquare" },
   { href: "/dashboard/gebruikers", label: "Gebruikers", shortLabel: "Users", icon: Users, iconName: "Users" },
   { href: "/dashboard/analytics", label: "Analytics", shortLabel: "Analytics", icon: BarChart3, iconName: "BarChart3" },
+  { href: "/dashboard/platform", label: "Platform", shortLabel: "Platform", icon: Globe, iconName: "Globe" },
 ];
 
 export default async function DashboardLayout({
