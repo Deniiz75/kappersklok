@@ -5,12 +5,15 @@ import {
   getShopBySlug,
   getBookedSlots,
   getCustomerAppointments,
+  getCustomerProfile,
   getFavorites,
   getWaitlistEntries,
 } from "@kappersklok/supabase";
 import {
   createAppointment,
   cancelAppointment,
+  rescheduleAppointment,
+  getAppointmentForReschedule,
 } from "@kappersklok/supabase";
 import {
   joinWaitlist,
@@ -18,6 +21,7 @@ import {
 } from "@kappersklok/supabase";
 import {
   toggleFavorite,
+  updateCustomerProfile,
 } from "@kappersklok/supabase";
 import {
   getAppointmentsForShop,
@@ -127,6 +131,45 @@ export function useToggleFavorite() {
       toggleFavorite(supabase, email, shopId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["favorites"] });
+    },
+  });
+}
+
+export function useCustomerProfile(email: string | undefined) {
+  return useQuery({
+    queryKey: ["customerProfile", email],
+    queryFn: () => getCustomerProfile(supabase, email!),
+    enabled: !!email,
+  });
+}
+
+export function useUpdateCustomerProfile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { email: string; name: string; phone?: string }) =>
+      updateCustomerProfile(supabase, data),
+    onSuccess: (_result, vars) => {
+      qc.invalidateQueries({ queryKey: ["customerProfile", vars.email] });
+    },
+  });
+}
+
+export function useAppointmentForReschedule(appointmentId: string | undefined) {
+  return useQuery({
+    queryKey: ["rescheduleAppointment", appointmentId],
+    queryFn: () => getAppointmentForReschedule(supabase, appointmentId!),
+    enabled: !!appointmentId,
+  });
+}
+
+export function useRescheduleAppointment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { appointmentId: string; date: string; startTime: string; endTime: string }) =>
+      rescheduleAppointment(supabase, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["appointments"] });
+      qc.invalidateQueries({ queryKey: ["rescheduleAppointment"] });
     },
   });
 }

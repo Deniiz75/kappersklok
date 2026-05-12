@@ -1,11 +1,17 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { User, LogOut, ArrowLeftRight } from "lucide-react-native";
+import { useRouter } from "expo-router";
+import { User, LogOut, ArrowLeftRight, Pencil } from "lucide-react-native";
 import { useAuth } from "../../../lib/auth-context";
+import { useCustomerProfile } from "../../../lib/hooks";
 import { colors } from "../../../lib/theme";
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { session, signOut, setMode } = useAuth();
+  const email = session?.user.email;
+  const { data: profile } = useCustomerProfile(email);
+  const p = profile as { name?: string | null; phone?: string | null } | null | undefined;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -13,10 +19,16 @@ export default function ProfileScreen() {
         <View style={styles.iconWrap}>
           <User size={32} color={colors.gold} />
         </View>
-        <Text style={styles.title}>Profiel</Text>
-        <Text style={styles.email}>{session?.user.email || "Niet ingelogd"}</Text>
+        <Text style={styles.title}>{p?.name || "Profiel"}</Text>
+        <Text style={styles.email}>{email || "Niet ingelogd"}</Text>
+        {p?.phone && <Text style={styles.email}>{p.phone}</Text>}
 
         <View style={styles.actions}>
+          <TouchableOpacity style={styles.actionButton} onPress={() => router.push("/(customer)/(profile)/edit")}>
+            <Pencil size={18} color={colors.gold} />
+            <Text style={styles.actionText}>Profiel bewerken</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.actionButton} onPress={() => setMode("barber")}>
             <ArrowLeftRight size={18} color={colors.gold} />
             <Text style={styles.actionText}>Wissel naar Kapper-modus</Text>

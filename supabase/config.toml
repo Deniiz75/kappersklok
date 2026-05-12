@@ -1,0 +1,6 @@
+project_id = "kappersklok"
+
+[functions.send-reminders]
+# JWT-verification AAN — alleen service-role of geldige user-JWT kan invoken.
+# Cron stuurt service-role bearer; zonder Authorization → 401.
+verify_jwt = true

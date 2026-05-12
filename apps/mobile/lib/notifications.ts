@@ -1,7 +1,13 @@
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
+import Constants from "expo-constants";
 import { Platform } from "react-native";
 import { supabase } from "./supabase";
+
+function getEasProjectId(): string | undefined {
+  const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+  return typeof projectId === "string" ? projectId : undefined;
+}
 
 // Configure how notifications appear when app is in foreground
 Notifications.setNotificationHandler({
@@ -50,10 +56,14 @@ export async function registerForPushNotifications(
     });
   }
 
+  const projectId = getEasProjectId();
+  if (!projectId) {
+    console.warn("[Push] EAS projectId missing from app.json extra.eas.projectId");
+    return null;
+  }
+
   // Get Expo push token
-  const { data: tokenData } = await Notifications.getExpoPushTokenAsync({
-    projectId: "kappersklok",
-  });
+  const { data: tokenData } = await Notifications.getExpoPushTokenAsync({ projectId });
   const token = tokenData;
 
   // Store in Supabase (upsert)
@@ -76,9 +86,9 @@ export async function registerForPushNotifications(
  */
 export async function unregisterPushToken(userEmail: string) {
   try {
-    const { data: tokenData } = await Notifications.getExpoPushTokenAsync({
-      projectId: "kappersklok",
-    });
+    const projectId = getEasProjectId();
+    if (!projectId) return;
+    const { data: tokenData } = await Notifications.getExpoPushTokenAsync({ projectId });
     await supabase
       .from("PushToken")
       .delete()

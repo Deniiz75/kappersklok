@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ChevronLeft, Scissors, User, CalendarDays, Clock, Bell, Check } from "lucide-react-native";
-import { useBookedSlots, useCreateAppointment, useJoinWaitlist } from "../../../../lib/hooks";
+import { useAuth } from "../../../../lib/auth-context";
+import { useBookedSlots, useCreateAppointment, useJoinWaitlist, useCustomerProfile } from "../../../../lib/hooks";
 import { supabase } from "../../../../lib/supabase";
 import { colors } from "../../../../lib/theme";
 import { formatPrice, generateTimeSlots, addMinutes, timeToMinutes } from "@kappersklok/shared";
@@ -13,6 +14,9 @@ const shortDays = ["Zo", "Ma", "Di", "Wo", "Do", "Vr", "Za"];
 export default function BookScreen() {
   const { shopId } = useLocalSearchParams<{ shopId: string }>();
   const router = useRouter();
+  const { session } = useAuth();
+  const sessionEmail = session?.user.email || "";
+  const { data: profile } = useCustomerProfile(sessionEmail || undefined);
   // Shop data loaded via useEffect below (we need by ID, not slug)
   const createAppointment = useCreateAppointment();
   const joinWaitlist = useJoinWaitlist();
@@ -29,10 +33,20 @@ export default function BookScreen() {
   const [waitlistMode, setWaitlistMode] = useState(false);
   const [waitlistSuccess, setWaitlistSuccess] = useState(false);
 
-  // Form fields
+  // Form fields — email locked to session; name+phone pre-filled from profile when available
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const email = sessionEmail;
+  const prefilledRef = useRef(false);
+
+  useEffect(() => {
+    if (prefilledRef.current) return;
+    const p = profile as { name?: string | null; phone?: string | null } | null | undefined;
+    if (!p) return;
+    prefilledRef.current = true;
+    if (p.name) setName(p.name);
+    if (p.phone) setPhone(p.phone);
+  }, [profile]);
 
   // Fetch shop by ID
   useEffect(() => {
@@ -239,9 +253,12 @@ export default function BookScreen() {
                 </View>
                 <Text style={styles.waitlistSub}>Laat uw gegevens achter voor de wachtlijst.</Text>
                 <TextInput style={styles.input} placeholder="Naam *" placeholderTextColor={colors.muted} value={name} onChangeText={setName} />
-                <TextInput style={styles.input} placeholder="E-mail *" placeholderTextColor={colors.muted} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+                <View style={[styles.input, styles.readonlyInput]}>
+                  <Text style={styles.readonlyLabel}>E-mail</Text>
+                  <Text style={styles.readonlyValue}>{email}</Text>
+                </View>
                 <TextInput style={styles.input} placeholder="Telefoon (optioneel)" placeholderTextColor={colors.muted} value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
-                <TouchableOpacity style={styles.goldButton} onPress={handleWaitlist} disabled={joinWaitlist.isPending}>
+                <TouchableOpacity style={styles.goldButton} onPress={handleWaitlist} disabled={joinWaitlist.isPending || !name}>
                   <Bell size={16} color={colors.background} />
                   <Text style={styles.goldButtonText}>{joinWaitlist.isPending ? "Aanmelden..." : "Zet me op de wachtlijst"}</Text>
                 </TouchableOpacity>
@@ -272,7 +289,10 @@ export default function BookScreen() {
             </View>
 
             <TextInput style={styles.input} placeholder="Naam *" placeholderTextColor={colors.muted} value={name} onChangeText={setName} />
-            <TextInput style={styles.input} placeholder="E-mail *" placeholderTextColor={colors.muted} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+            <View style={[styles.input, styles.readonlyInput]}>
+              <Text style={styles.readonlyLabel}>E-mail</Text>
+              <Text style={styles.readonlyValue}>{email}</Text>
+            </View>
             <TextInput style={styles.input} placeholder="Telefoon (optioneel)" placeholderTextColor={colors.muted} value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
 
             <TouchableOpacity
@@ -381,6 +401,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
     borderRadius: 12, padding: 14, fontSize: 15, color: colors.foreground, marginBottom: 10,
   },
+  readonlyInput: { opacity: 0.7, paddingVertical: 10 },
+  readonlyLabel: { fontSize: 10, color: colors.muted, marginBottom: 2 },
+  readonlyValue: { fontSize: 14, color: colors.foreground },
   goldButton: {
     flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
     backgroundColor: colors.gold, borderRadius: 12, paddingVertical: 14, marginTop: 4,

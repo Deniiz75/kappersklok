@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { CalendarDays, Clock, MapPin, Scissors, Bell, Check, X } from "lucide-react-native";
+import { CalendarDays, Clock, MapPin, Scissors, Bell, Check, X, RefreshCw } from "lucide-react-native";
 import { useAuth } from "../../../lib/auth-context";
 import { useMyAppointments, useMyWaitlist, useCancelAppointment, useCancelWaitlistEntry } from "../../../lib/hooks";
 import { colors } from "../../../lib/theme";
@@ -174,6 +174,13 @@ export default function BookingsScreen() {
                       <View style={styles.confirmedBadge}>
                         <Text style={styles.confirmedText}>Bevestigd</Text>
                       </View>
+                      <TouchableOpacity
+                        style={styles.rescheduleLink}
+                        onPress={() => router.push(`/(customer)/(bookings)/reschedule/${apt.id}`)}
+                      >
+                        <RefreshCw size={11} color={colors.gold} />
+                        <Text style={styles.rescheduleText}>Herplannen</Text>
+                      </TouchableOpacity>
                       {apt.cancelToken && (
                         <TouchableOpacity onPress={() => handleCancel(apt.cancelToken!)}>
                           <Text style={styles.cancelLink}>Annuleren</Text>
@@ -262,6 +269,8 @@ const styles = StyleSheet.create({
   bookNowBadge: { backgroundColor: "rgba(109, 184, 123, 0.1)", borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 },
   bookNowText: { fontSize: 10, fontWeight: "600", color: colors.success },
   cancelLink: { fontSize: 10, color: colors.muted },
+  rescheduleLink: { flexDirection: "row", alignItems: "center", gap: 3 },
+  rescheduleText: { fontSize: 10, color: colors.gold, fontWeight: "500" },
   // Empty
   emptyCard: {
     backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.separator,
