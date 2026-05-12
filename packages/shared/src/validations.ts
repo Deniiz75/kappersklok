@@ -22,7 +22,7 @@ export const registrationSchema = z.object({
   email: z.string().email("Ongeldig e-mailadres"),
   instagram: z.string().optional(),
   howFoundUs: z.string().optional(),
-  password: z.string().min(6, "Wachtwoord moet minimaal 6 tekens zijn"),
+  password: z.string().min(12, "Wachtwoord moet minimaal 12 tekens zijn"),
   digibox: z.boolean().default(false),
   privateDomain: z.string().optional(),
   barbersCount: z.number().int().min(4).max(10).default(4),
@@ -31,7 +31,7 @@ export const registrationSchema = z.object({
 
 export const loginSchema = z.object({
   email: z.string().email("Ongeldig e-mailadres"),
-  password: z.string().min(6, "Wachtwoord moet minimaal 6 tekens zijn"),
+  password: z.string().min(1, "Wachtwoord is verplicht"),
 });
 
 export type ContactFormData = z.infer<typeof contactFormSchema>;

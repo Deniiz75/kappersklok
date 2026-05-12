@@ -53,28 +53,50 @@ export async function createRegistrationPayment(
   return { checkoutUrl, paymentId: payment.id };
 }
 
+function eurosToCents(value: string): number {
+  return Math.round(parseFloat(value) * 100);
+}
+
 /**
  * Verwerk een Mollie webhook: haal betaalstatus op en update database.
- * Als betaald → activeer de shop.
+ * Verifieert dat amount + metadata.shopId matchen met onze Payment record
+ * (replay-protection) voor we de shop activeren.
  */
 export async function handleMollieWebhook(molliePaymentId: string) {
   const payment = await getMollieClient().payments.get(molliePaymentId);
 
-  // Vind onze Payment record
   const { data: dbPayment, error: findError } = await supabase
     .from("Payment")
-    .select("id, shopId, status")
+    .select("id, shopId, status, amount")
     .eq("mollieId", molliePaymentId)
     .single();
 
   if (findError || !dbPayment) return;
 
-  // Map Mollie status naar onze PaymentStatus
   let newStatus: "PAID" | "PENDING" | "FAILED" = "PENDING";
   if (payment.status === "paid") newStatus = "PAID";
   else if (["failed", "canceled", "expired"].includes(payment.status)) newStatus = "FAILED";
 
-  // Update Payment record
+  if (newStatus === "PAID") {
+    const mollieAmountCents = eurosToCents(payment.amount.value);
+    if (mollieAmountCents !== dbPayment.amount) {
+      console.error(
+        `[mollie-webhook] amount mismatch for ${molliePaymentId}: mollie=${mollieAmountCents} db=${dbPayment.amount}`,
+      );
+      return;
+    }
+    const metadataShopId =
+      typeof payment.metadata === "object" && payment.metadata !== null
+        ? (payment.metadata as { shopId?: string }).shopId
+        : undefined;
+    if (metadataShopId && metadataShopId !== dbPayment.shopId) {
+      console.error(
+        `[mollie-webhook] shopId mismatch for ${molliePaymentId}`,
+      );
+      return;
+    }
+  }
+
   await supabase
     .from("Payment")
     .update({
@@ -84,7 +106,6 @@ export async function handleMollieWebhook(molliePaymentId: string) {
     })
     .eq("id", dbPayment.id);
 
-  // Als betaald → activeer shop
   if (newStatus === "PAID" && dbPayment.status !== "PAID") {
     await supabase
       .from("Shop")

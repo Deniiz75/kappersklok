@@ -8,13 +8,19 @@ const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  // Admin user
-  const passwordHash = await bcrypt.hash("admin123", 10);
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@kappersklok.nl";
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminPassword || adminPassword.length < 12) {
+    throw new Error(
+      "ADMIN_PASSWORD environment variable is required to seed (min 12 characters). Set it before running db:seed.",
+    );
+  }
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
   const admin = await prisma.user.upsert({
-    where: { email: "admin@kappersklok.nl" },
+    where: { email: adminEmail },
     update: {},
     create: {
-      email: "admin@kappersklok.nl",
+      email: adminEmail,
       passwordHash,
       role: "ADMIN",
     },

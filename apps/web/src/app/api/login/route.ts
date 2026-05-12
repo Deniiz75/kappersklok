@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import bcrypt from "bcryptjs";
-import { SignJWT } from "jose";
+import {
+  signSessionToken,
+  SESSION_COOKIE_NAME,
+  sessionCookieOptions,
+  SESSION_MAX_AGE_DAYS,
+} from "@/lib/jwt";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,7 +17,6 @@ export async function POST(req: NextRequest) {
     let email = "";
     let password = "";
 
-    // Support both JSON (fetch) and form data (HTML form)
     if (contentType.includes("application/json")) {
       const body = await req.json();
       email = body.email;
@@ -36,7 +39,6 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error || !user) {
-      // For form submissions, redirect back with error
       if (!contentType.includes("application/json")) {
         return NextResponse.redirect(new URL("/login?error=invalid", req.url));
       }
@@ -51,33 +53,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Onjuist e-mailadres of wachtwoord." }, { status: 401 });
     }
 
-    const token = await new SignJWT({ userId: user.id, email: user.email, role: user.role })
-      .setProtectedHeader({ alg: "HS256" })
-      .setExpirationTime("14d")
-      .sign(SECRET);
+    const token = await signSessionToken(
+      { userId: user.id, email: user.email, role: user.role },
+      `${SESSION_MAX_AGE_DAYS}d`,
+    );
+    const cookieOpts = sessionCookieOptions(60 * 60 * 24 * SESSION_MAX_AGE_DAYS);
 
-    // For form submissions, redirect to dashboard
     if (!contentType.includes("application/json")) {
       const response = NextResponse.redirect(new URL("/dashboard", req.url));
-      response.cookies.set("kk_session", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "lax",
-        maxAge: 60 * 60 * 24 * 14,
-        path: "/",
-      });
+      response.cookies.set(SESSION_COOKIE_NAME, token, cookieOpts);
       return response;
     }
 
-    // For JSON fetch
     const response = NextResponse.json({ success: true });
-    response.cookies.set("kk_session", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 14,
-      path: "/",
-    });
+    response.cookies.set(SESSION_COOKIE_NAME, token, cookieOpts);
     return response;
   } catch {
     return NextResponse.json({ success: false, error: "Er ging iets mis." }, { status: 500 });

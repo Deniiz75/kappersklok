@@ -3,9 +3,15 @@ import { createClient } from "@supabase/supabase-js";
 import { sendEmail, reminderEmail } from "@/lib/email";
 
 export async function GET(req: NextRequest) {
-  // Verify cron secret
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret || cronSecret.length < 32) {
+    return NextResponse.json(
+      { error: "CRON_SECRET not configured (min 32 chars)" },
+      { status: 500 },
+    );
+  }
   const authHeader = req.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

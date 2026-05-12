@@ -35,7 +35,9 @@ export async function createAppointment(data: unknown): Promise<BookingResult> {
   const d = parsed.data;
 
   try {
-    // Check conflict
+    // NOTE: echte race-safety vereist een partial unique index
+    // op (barberId, date, startTime) WHERE status='CONFIRMED'. Tot die migration draait
+    // doen we hier pre-check + post-insert dupe-check als best-effort defense.
     const { data: existing } = await supabase
       .from("Appointment")
       .select("id")
@@ -49,7 +51,6 @@ export async function createAppointment(data: unknown): Promise<BookingResult> {
       return { success: false, error: "Dit tijdslot is al bezet. Kies een ander tijdstip." };
     }
 
-    // Create appointment — id + cancelToken moeten expliciet omdat Supabase geen Prisma defaults kent
     const appointmentId = generateId();
     const cancelToken = generateId();
     const { data: appointment, error } = await supabase
@@ -73,8 +74,27 @@ export async function createAppointment(data: unknown): Promise<BookingResult> {
       .single();
 
     if (error || !appointment) {
-      console.error("[createAppointment] Insert failed:", error?.message, error?.details, error?.hint);
+      console.error("[createAppointment] Insert failed:", error?.code || "unknown");
       throw error;
+    }
+
+    // Post-insert race check: als er nu meerdere CONFIRMED-rijen zijn voor dit slot,
+    // kwamen twee requests bijna tegelijk binnen. De kleinste id wint, deze cancelt.
+    const { data: dupes } = await supabase
+      .from("Appointment")
+      .select("id")
+      .eq("barberId", d.barberId)
+      .eq("date", d.date)
+      .eq("startTime", d.startTime)
+      .eq("status", "CONFIRMED")
+      .order("id", { ascending: true });
+
+    if (dupes && dupes.length > 1 && dupes[0].id !== appointment.id) {
+      await supabase
+        .from("Appointment")
+        .update({ status: "CANCELLED" })
+        .eq("id", appointment.id);
+      return { success: false, error: "Dit tijdslot is al bezet. Kies een ander tijdstip." };
     }
 
     // Get shop + barber + service names for email
@@ -107,9 +127,8 @@ export async function createAppointment(data: unknown): Promise<BookingResult> {
 
     return { success: true, appointmentId: appointment.id };
   } catch (err) {
-    console.error("[createAppointment] Error:", err);
-    const msg = err instanceof Error ? err.message : String(err);
-    return { success: false, error: `Fout bij het boeken: ${msg}` };
+    console.error("[createAppointment] Error:", err instanceof Error ? err.name : "unknown");
+    return { success: false, error: "Er ging iets mis bij het boeken. Probeer het later opnieuw." };
   }
 }
 
@@ -316,7 +335,7 @@ export async function joinWaitlist(data: unknown): Promise<{ success: boolean; e
   });
 
   if (error) {
-    console.error("[joinWaitlist] Insert failed:", error.message);
+    console.error("[joinWaitlist] Insert failed:", error.code || "unknown");
     return { success: false, error: "Er ging iets mis. Probeer het later opnieuw." };
   }
 

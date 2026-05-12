@@ -1,46 +1,62 @@
-import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import {
+  signSessionToken,
+  verifySessionToken,
+  SESSION_COOKIE_NAME,
+  CUSTOMER_COOKIE_NAME,
+  sessionCookieOptions,
+  SESSION_MAX_AGE_DAYS,
+  CUSTOMER_MAX_AGE_DAYS,
+  type AdminBarberSession,
+  type CustomerSession,
+} from "./jwt";
 
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
-const COOKIE_NAME = "kk_session";
-
-interface SessionPayload {
-  userId: string;
-  email: string;
-  role: string;
-  [key: string]: unknown;
-}
+export type SessionPayload = AdminBarberSession;
 
 export async function createSession(payload: SessionPayload) {
-  const token = await new SignJWT(payload)
-    .setProtectedHeader({ alg: "HS256" })
-    .setExpirationTime("14d")
-    .sign(SECRET);
-
+  const token = await signSessionToken(payload, `${SESSION_MAX_AGE_DAYS}d`);
   const cookieStore = await cookies();
-  cookieStore.set(COOKIE_NAME, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 14, // 14 days
-    path: "/",
-  });
+  cookieStore.set(
+    SESSION_COOKIE_NAME,
+    token,
+    sessionCookieOptions(60 * 60 * 24 * SESSION_MAX_AGE_DAYS),
+  );
 }
 
 export async function getSession(): Promise<SessionPayload | null> {
   const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
+  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
   if (!token) return null;
-
-  try {
-    const { payload } = await jwtVerify(token, SECRET);
-    return payload as unknown as SessionPayload;
-  } catch {
-    return null;
-  }
+  return verifySessionToken<SessionPayload>(token);
 }
 
 export async function destroySession() {
   const cookieStore = await cookies();
-  cookieStore.delete(COOKIE_NAME);
+  cookieStore.delete(SESSION_COOKIE_NAME);
+}
+
+export async function createCustomerSession(customerEmail: string) {
+  const token = await signSessionToken(
+    { customerEmail, role: "CUSTOMER" },
+    `${CUSTOMER_MAX_AGE_DAYS}d`,
+  );
+  const cookieStore = await cookies();
+  cookieStore.set(
+    CUSTOMER_COOKIE_NAME,
+    token,
+    sessionCookieOptions(60 * 60 * 24 * CUSTOMER_MAX_AGE_DAYS),
+  );
+}
+
+export async function getCustomerEmail(): Promise<string | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(CUSTOMER_COOKIE_NAME)?.value;
+  if (!token) return null;
+  const payload = await verifySessionToken<CustomerSession>(token);
+  return payload?.customerEmail || null;
+}
+
+export async function destroyCustomerSession() {
+  const cookieStore = await cookies();
+  cookieStore.delete(CUSTOMER_COOKIE_NAME);
 }

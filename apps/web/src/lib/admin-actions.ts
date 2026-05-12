@@ -5,6 +5,7 @@ import { getSession } from "@/lib/auth";
 import { sendEmail, cancellationConfirmationEmail } from "@/lib/email";
 import { notifyWaitlistForCancellation } from "@/lib/booking-actions";
 import { hash } from "bcryptjs";
+import { z } from "zod";
 
 async function requireAdmin() {
   const session = await getSession();
@@ -13,6 +14,24 @@ async function requireAdmin() {
   }
   return session;
 }
+
+const shopUpdateSchema = z
+  .object({
+    name: z.string().min(1).max(120).optional(),
+    contactName: z.string().min(1).max(120).optional(),
+    email: z.string().email().optional(),
+    phone: z.string().min(1).max(40).optional(),
+    privatePhone: z.string().min(1).max(40).optional(),
+    street: z.string().max(120).optional(),
+    houseNumber: z.string().max(20).optional(),
+    postalCode: z.string().max(20).optional(),
+    city: z.string().max(80).optional(),
+    country: z.string().max(80).optional(),
+    instagram: z.string().max(80).optional(),
+    language: z.enum(["nl_NL", "en_US"]).optional(),
+    barbersCount: z.number().int().min(1).max(50).optional(),
+  })
+  .strict();
 
 // --- Shop management ---
 
@@ -23,9 +42,16 @@ export async function updateShopStatus(shopId: string, status: "ACTIVE" | "SUSPE
   return { success: true };
 }
 
-export async function updateShop(shopId: string, data: Record<string, unknown>) {
+export async function updateShop(shopId: string, data: unknown) {
   await requireAdmin();
-  const { error } = await supabase.from("Shop").update(data).eq("id", shopId);
+  const parsed = shopUpdateSchema.safeParse(data);
+  if (!parsed.success) {
+    return { success: false, error: "Ongeldige velden in update." };
+  }
+  if (Object.keys(parsed.data).length === 0) {
+    return { success: false, error: "Geen velden om bij te werken." };
+  }
+  const { error } = await supabase.from("Shop").update(parsed.data).eq("id", shopId);
   if (error) return { success: false, error: "Kon shop niet bijwerken." };
   return { success: true };
 }

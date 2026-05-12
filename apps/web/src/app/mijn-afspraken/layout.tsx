@@ -1,12 +1,9 @@
-import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { MobileNav } from "@/components/mobile-nav";
 import { LogOut } from "lucide-react";
-
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
+import { getCustomerEmail } from "@/lib/auth";
 
 const customerNav = [
   { href: "/mijn-afspraken", label: "Afspraken", shortLabel: "Afspraken", iconName: "CalendarDays" },
@@ -19,18 +16,7 @@ export default async function KlantPortaalLayout({
 }: {
   children: React.ReactNode;
 }) {
-  let email: string | null = null;
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("kk_customer")?.value;
-    if (token) {
-      const { payload } = await jwtVerify(token, SECRET);
-      email = (payload.customerEmail as string) || null;
-    }
-  } catch {
-    // token invalid
-  }
-
+  const email = await getCustomerEmail();
   if (!email) redirect("/login?tab=klant");
 
   return (

@@ -1,11 +1,10 @@
-import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import { Card, CardContent } from "@/components/ui/card";
 import { ButtonLink } from "@/components/button-link";
 import { getFavorites } from "@/lib/customer-actions";
+import { getCustomerEmail } from "@/lib/auth";
 import {
   CalendarDays,
   Clock,
@@ -23,20 +22,6 @@ import {
 import { WaitlistActions } from "@/components/waitlist-actions";
 
 export const dynamic = "force-dynamic";
-
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
-
-async function getCustomerEmail(): Promise<string | null> {
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("kk_customer")?.value;
-    if (!token) return null;
-    const { payload } = await jwtVerify(token, SECRET);
-    return (payload.customerEmail as string) || null;
-  } catch {
-    return null;
-  }
-}
 
 const dayNames = ["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"];
 const monthNames = ["jan", "feb", "mrt", "apr", "mei", "jun", "jul", "aug", "sep", "okt", "nov", "dec"];

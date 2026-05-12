@@ -245,7 +245,7 @@ export default function AanmeldenPage() {
                     <Input name="email" type="email" placeholder="jan@kapper.nl" required defaultValue={step1Data?.email} className="border-border/50 bg-background/50" />
                   </Field>
                   <Field label="Wachtwoord">
-                    <Input name="password" type="password" placeholder="Min. 6 tekens" required minLength={6} className="border-border/50 bg-background/50" />
+                    <Input name="password" type="password" placeholder="Min. 12 tekens" required minLength={12} className="border-border/50 bg-background/50" />
                   </Field>
                 </div>
               </FormSection>
