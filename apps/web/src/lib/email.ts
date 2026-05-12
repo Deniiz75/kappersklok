@@ -156,52 +156,6 @@ function secondaryButton(href: string, label: string) {
 
 // ── Email templates ──
 
-export function bookingConfirmationEmail(data: {
-  customerName: string;
-  shopName: string;
-  serviceName: string;
-  date: string;
-  time: string;
-  barberName: string;
-  cancelToken: string;
-}) {
-  const cancelUrl = `https://kappersklok.vercel.app/afspraak/annuleren?token=${data.cancelToken}`;
-  const myUrl = "https://kappersklok.vercel.app/mijn-afspraken";
-
-  const content = `
-    ${statusBadge("&#10003;&ensp;Bevestigd", "#6db87b", "#0f1a0f", "#1a2e1a")}
-
-    <h1 style="margin:18px 0 6px;font-size:24px;font-weight:700;color:#f5f5f5;font-family:Georgia,'Times New Roman',serif;line-height:1.2;">
-      Uw afspraak staat gepland
-    </h1>
-    <p style="margin:0 0 2px;font-size:14px;color:#777;line-height:1.5;">
-      Beste ${data.customerName}, alles is geregeld bij
-    </p>
-    <p style="margin:0;font-size:18px;font-weight:700;color:#d4a853;font-family:Georgia,'Times New Roman',serif;letter-spacing:0.3px;">
-      ${data.shopName}
-    </p>
-
-    ${detailsCard(
-      detailRow("Dienst", data.serviceName) +
-      detailRow("Kapper", data.barberName) +
-      detailRow("Datum", data.date) +
-      detailRow("Tijd", data.time, true)
-    )}
-
-    ${primaryButton(myUrl, "Bekijk afspraak")}
-
-    <p style="margin:24px 0 0;font-size:12px;color:#555;line-height:1.6;">
-      Wijzigen of annuleren kan tot 2 uur van tevoren via
-      <a href="${cancelUrl}" style="color:#d4a853;text-decoration:none;">deze link</a>.
-    </p>
-  `;
-
-  return {
-    subject: `Afspraak bevestigd bij ${data.shopName}`,
-    html: emailLayout(content, `Uw afspraak bij ${data.shopName} op ${data.date} om ${data.time} is bevestigd.`),
-  };
-}
-
 export function cancellationConfirmationEmail(data: {
   customerName: string;
   shopName: string;
@@ -224,52 +178,11 @@ export function cancellationConfirmationEmail(data: {
       detailRow("Datum", data.date) +
       detailRow("Tijd", data.time, true)
     )}
-
-    <p style="margin:0 0 16px;font-size:13px;color:#666;">Wilt u opnieuw boeken?</p>
-    ${primaryButton("https://kappersklok.vercel.app/kapper-zoeken", "Nieuwe afspraak")}
   `;
 
   return {
     subject: `Afspraak geannuleerd — ${data.shopName}`,
     html: emailLayout(content, `Uw afspraak bij ${data.shopName} op ${data.date} is geannuleerd.`),
-  };
-}
-
-export function reminderEmail(data: {
-  customerName: string;
-  shopName: string;
-  serviceName: string;
-  date: string;
-  time: string;
-  barberName: string;
-}) {
-  const content = `
-    ${statusBadge("&#9719;&ensp;Morgen", "#d4a853", "#141008", "#2e2510")}
-
-    <h1 style="margin:18px 0 6px;font-size:24px;font-weight:700;color:#f5f5f5;font-family:Georgia,'Times New Roman',serif;line-height:1.2;">
-      Niet vergeten: afspraak morgen
-    </h1>
-    <p style="margin:0;font-size:14px;color:#777;line-height:1.5;">
-      Beste ${data.customerName}, morgen wordt u verwacht bij <strong style="color:#d4a853;">${data.shopName}</strong>.
-    </p>
-
-    ${detailsCard(
-      detailRow("Dienst", data.serviceName) +
-      detailRow("Kapper", data.barberName) +
-      detailRow("Datum", data.date) +
-      detailRow("Tijd", data.time, true)
-    )}
-
-    ${primaryButton("https://kappersklok.vercel.app/mijn-afspraken", "Bekijk afspraak")}
-
-    <p style="margin:24px 0 0;font-size:12px;color:#444;line-height:1.5;text-align:center;font-style:italic;">
-      Wij kijken ernaar uit u te verwelkomen.
-    </p>
-  `;
-
-  return {
-    subject: `Morgen ${data.time} — afspraak bij ${data.shopName}`,
-    html: emailLayout(content, `Herinnering: morgen om ${data.time} bij ${data.shopName}.`),
   };
 }
 
@@ -312,77 +225,3 @@ export function barberNotificationEmail(data: {
   };
 }
 
-export function waitlistConfirmationEmail(data: {
-  customerName: string;
-  shopName: string;
-  serviceName: string;
-  barberName: string;
-  date: string;
-}) {
-  const content = `
-    ${statusBadge("&#9719;&ensp;Wachtlijst", "#d4a853", "#141008", "#2e2510")}
-
-    <h1 style="margin:18px 0 6px;font-size:24px;font-weight:700;color:#f5f5f5;font-family:Georgia,'Times New Roman',serif;line-height:1.2;">
-      U staat op de wachtlijst
-    </h1>
-    <p style="margin:0;font-size:14px;color:#777;line-height:1.5;">
-      Beste ${data.customerName}, u bent aangemeld voor de wachtlijst bij <strong style="color:#d4a853;">${data.shopName}</strong>.
-    </p>
-
-    ${detailsCard(
-      detailRow("Dienst", data.serviceName) +
-      detailRow("Kapper", data.barberName) +
-      detailRow("Datum", data.date, true)
-    )}
-
-    <p style="margin:0;font-size:13px;color:#666;line-height:1.6;">
-      Wij sturen u een e-mail zodra er een plek vrijkomt.
-    </p>
-
-    ${primaryButton("https://kappersklok.vercel.app/mijn-afspraken", "Mijn afspraken")}
-  `;
-
-  return {
-    subject: `Wachtlijst — ${data.shopName} op ${data.date}`,
-    html: emailLayout(content, `U staat op de wachtlijst bij ${data.shopName} op ${data.date}.`),
-  };
-}
-
-export function waitlistNotificationEmail(data: {
-  customerName: string;
-  shopName: string;
-  shopSlug: string;
-  barberName: string;
-  date: string;
-  freedTime: string;
-}) {
-  const bookUrl = `https://kappersklok.vercel.app/kapperszaak/${data.shopSlug}`;
-
-  const content = `
-    ${statusBadge("&#10003;&ensp;Plek beschikbaar!", "#6db87b", "#0f1a0f", "#1a2e1a")}
-
-    <h1 style="margin:18px 0 6px;font-size:24px;font-weight:700;color:#f5f5f5;font-family:Georgia,'Times New Roman',serif;line-height:1.2;">
-      Er is een plek vrijgekomen!
-    </h1>
-    <p style="margin:0;font-size:14px;color:#777;line-height:1.5;">
-      Beste ${data.customerName}, er is een plek vrijgekomen bij <strong style="color:#d4a853;">${data.shopName}</strong>.
-    </p>
-
-    ${detailsCard(
-      detailRow("Kapper", data.barberName) +
-      detailRow("Datum", data.date) +
-      detailRow("Tijd", data.freedTime, true)
-    )}
-
-    <p style="margin:0 0 20px;font-size:13px;color:#d4a853;line-height:1.5;font-weight:500;">
-      &#9888; Wees er snel bij — andere klanten zijn ook op de hoogte gebracht.
-    </p>
-
-    ${primaryButton(bookUrl, "Nu boeken")}
-  `;
-
-  return {
-    subject: `Plek vrijgekomen bij ${data.shopName} op ${data.date}!`,
-    html: emailLayout(content, `Er is een plek vrijgekomen bij ${data.shopName} op ${data.date} om ${data.freedTime}!`),
-  };
-}

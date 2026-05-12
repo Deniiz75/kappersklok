@@ -8,7 +8,6 @@ import { BrandLink } from "@/components/brand-link";
 import { Settings, LogOut, LayoutDashboard } from "lucide-react";
 
 const navLinks = [
-  { href: "/kapper-zoeken", label: "Kappers zoeken" },
   { href: "/informatie", label: "Hoe het werkt" },
   { href: "/contact", label: "Contact" },
 ];

@@ -3,9 +3,7 @@ import type { NextRequest } from "next/server";
 import {
   verifySessionToken,
   SESSION_COOKIE_NAME,
-  CUSTOMER_COOKIE_NAME,
   type AdminBarberSession,
-  type CustomerSession,
 } from "@/lib/jwt";
 
 export async function middleware(request: NextRequest) {
@@ -21,19 +19,9 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (path.startsWith("/mijn-afspraken")) {
-    const token = request.cookies.get(CUSTOMER_COOKIE_NAME)?.value;
-    const session = token
-      ? await verifySessionToken<CustomerSession>(token)
-      : null;
-    if (!session) {
-      return NextResponse.redirect(new URL("/login?tab=klant", request.url));
-    }
-  }
-
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/mijn-afspraken/:path*"],
+  matcher: ["/dashboard/:path*"],
 };

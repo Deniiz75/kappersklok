@@ -3,7 +3,6 @@
 import { supabase } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { sendEmail, cancellationConfirmationEmail } from "@/lib/email";
-import { notifyWaitlistForCancellation } from "@/lib/booking-actions";
 import { hash } from "bcryptjs";
 import { z } from "zod";
 
@@ -115,11 +114,6 @@ export async function adminCancelAppointment(appointmentId: string) {
     });
     sendEmail({ to: apt.customerEmail, ...email }).catch(() => {});
   }
-
-  // Notify waitlisted customers
-  notifyWaitlistForCancellation(
-    apt.shopId, apt.barberId, apt.date, apt.startTime, apt.endTime,
-  ).catch(() => {});
 
   return { success: true };
 }

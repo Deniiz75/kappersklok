@@ -41,13 +41,7 @@ export interface AdminBarberSession extends JWTPayload {
   role: string;
 }
 
-export interface CustomerSession extends JWTPayload {
-  customerEmail: string;
-  role: "CUSTOMER";
-}
-
 export const SESSION_COOKIE_NAME = "kk_session";
-export const CUSTOMER_COOKIE_NAME = "kk_customer";
 
 export function sessionCookieOptions(maxAgeSeconds: number) {
   return {
@@ -60,4 +54,3 @@ export function sessionCookieOptions(maxAgeSeconds: number) {
 }
 
 export const SESSION_MAX_AGE_DAYS = 14;
-export const CUSTOMER_MAX_AGE_DAYS = 7;
